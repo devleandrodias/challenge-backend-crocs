@@ -1,7 +1,11 @@
 import { Message } from "kafkajs";
+
 import { kafka } from "./configs/kafka.config";
+import { redisClient } from "./configs/redis.config";
+
 import { EventInput } from "./models/EventInput";
 import { LocationOutput } from "./models/LocationOutput";
+
 import { EKafkaTopics } from "./infrastructure/kafka/topics/EKafkaTopics";
 
 async function fakeApi(input: EventInput): Promise<LocationOutput> {
@@ -15,6 +19,28 @@ async function fakeApi(input: EventInput): Promise<LocationOutput> {
     latitude: 37.7749,
     longitude: -122.4194,
   };
+}
+
+// * Producer message on kafka topic (Output)
+async function producerLocationOutput(
+  input: EventInput,
+  output: LocationOutput
+) {
+  const producer = kafka.producer();
+
+  await producer.connect();
+
+  const messageLocation: Message = {
+    key: input.clientId,
+    value: JSON.stringify(output),
+  };
+
+  await producer.send({
+    topic: EKafkaTopics.LOCATION_OUTPUT,
+    messages: [messageLocation],
+  });
+
+  await producer.disconnect();
 }
 
 async function main() {
@@ -39,31 +65,35 @@ async function main() {
 
       console.log(eventInput);
 
-      // Get geographical locations by IP
-      const location = await fakeApi(eventInput);
+      // Verify on cache if IP already exists
+      redisClient.on("error", (err) => console.log("Redis Client Error", err));
 
-      /**
-       * Verify on cache if IP already exists (Valid per 30 minutes)
-       * If not exists => Get data from api
-       * If exists => Get data from cache
-       */
+      await redisClient.connect();
 
-      // Producer message on kafka topic (Output)
-      const producer = kafka.producer();
+      const locationOutputCache = await redisClient.get(eventInput.ip);
 
-      await producer.connect();
+      // If exists => Get data from cache
+      if (locationOutputCache) {
+        console.log(`[IP: ${eventInput.ip}] - Found in cache`);
 
-      const messageLocation: Message = {
-        key: eventInput.clientId,
-        value: JSON.stringify(location),
-      };
+        await producerLocationOutput(
+          eventInput,
+          JSON.parse(locationOutputCache)
+        );
+      }
 
-      await producer.send({
-        topic: EKafkaTopics.LOCATION_OUTPUT,
-        messages: [messageLocation],
-      });
+      // If not exists => Get data from api
+      if (!locationOutputCache) {
+        console.log(`[IP: ${eventInput.ip}] - Not found in cache`);
 
-      await producer.disconnect();
+        // Get geographical locations by IP
+        const locationOutputApi = await fakeApi(eventInput);
+
+        // Set location in cache
+        redisClient.set(eventInput.ip, JSON.stringify(locationOutputApi));
+
+        await producerLocationOutput(eventInput, locationOutputApi);
+      }
     },
   });
 }
