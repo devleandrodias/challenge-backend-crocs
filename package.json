@@ -1,0 +1,23 @@
+{
+  "name": "challenge-backend-crocs",
+  "version": "1.0.0",
+  "description": "Kafka Stream",
+  "scripts": {
+    "start": "ts-node-dev ./src/index.ts",
+    "test": "jest"
+  },
+  "keywords": [
+    "kafka",
+    "typescript"
+  ],
+  "author": "Leandro Dias",
+  "license": "ISC",
+  "dependencies": {
+    "kafkajs": "^2.2.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.1",
+    "jest": "^29.5.0",
+    "ts-node-dev": "^2.0.0"
+  }
+}
