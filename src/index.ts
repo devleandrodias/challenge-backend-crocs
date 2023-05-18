@@ -1,6 +1,21 @@
+import { Message } from "kafkajs";
 import { kafka } from "./configs/kafka.config";
-import { EKafkaTopics } from "./infrastructure/kafka/topics/EKafkaTopics";
 import { EventInput } from "./models/EventInput";
+import { LocationOutput } from "./models/LocationOutput";
+import { EKafkaTopics } from "./infrastructure/kafka/topics/EKafkaTopics";
+
+async function fakeApi(input: EventInput): Promise<LocationOutput> {
+  return {
+    ip: input.ip,
+    clientId: input.clientId,
+    timestamp: input.timestamp,
+    city: "San Francisco",
+    country: "United States",
+    region: "California",
+    latitude: 37.7749,
+    longitude: -122.4194,
+  };
+}
 
 async function main() {
   // Read IPs from kafka topic consumer (Input)
@@ -14,19 +29,41 @@ async function main() {
 
   await consumer.run({
     eachMessage: async ({ message, topic, partition }) => {
-      const response = JSON.parse(
-        message.value?.toString() || ""
-      ) as EventInput;
-
       console.log(
         `Receiving message: TOPIC: [${topic}] | Partition [${partition}]`
       );
 
-      console.log(response);
-      // Verify on cache if IP already exists (Valid per 30 minutes)
-      // If not exists -> Get geographical locations by IP
-      // If exists -> Get data from cache
+      const eventInput = JSON.parse(
+        message.value?.toString() || ""
+      ) as EventInput;
+
+      console.log(eventInput);
+
+      // Get geographical locations by IP
+      const location = await fakeApi(eventInput);
+
+      /**
+       * Verify on cache if IP already exists (Valid per 30 minutes)
+       * If not exists => Get data from api
+       * If exists => Get data from cache
+       */
+
       // Producer message on kafka topic (Output)
+      const producer = kafka.producer();
+
+      await producer.connect();
+
+      const messageLocation: Message = {
+        key: eventInput.clientId,
+        value: JSON.stringify(location),
+      };
+
+      await producer.send({
+        topic: EKafkaTopics.LOCATION_OUTPUT,
+        messages: [messageLocation],
+      });
+
+      await producer.disconnect();
     },
   });
 }

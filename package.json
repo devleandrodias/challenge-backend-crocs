@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Kafka Stream",
   "scripts": {
+    "util:data-test": "ts-node-dev ./src/utils/getRandomEventInput.ts",
+    "consumer:location": "ts-node-dev ./src/utils/consumerLocationOutput.ts",
     "start": "ts-node-dev ./src/index.ts",
     "test": "jest"
   },
