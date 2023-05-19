@@ -4,6 +4,7 @@ import { EventInput } from "../../models/EventInput";
 import { redisClient } from "../../configs/redis.config";
 import { LocationOutput } from "../../models/LocationOutput";
 import { EKafkaTopics } from "../../shared/enuns/EKafkaTopics";
+import { parseObjToString, parseStringToObj } from "../../utils/parser";
 
 export class TrackingIpRepository {
   async getLocationByCache(ip: string): Promise<LocationOutput | null> {
@@ -19,7 +20,7 @@ export class TrackingIpRepository {
       return null;
     }
 
-    return JSON.parse(location) as LocationOutput;
+    return parseStringToObj<LocationOutput>(location);
   }
 
   async getLocationByApi(eventInput: EventInput): Promise<LocationOutput> {
@@ -40,7 +41,7 @@ export class TrackingIpRepository {
 
     await redisClient.connect();
 
-    await redisClient.set(ip, JSON.stringify(output), {
+    await redisClient.set(ip, parseObjToString(output), {
       EX: 30,
       NX: true,
     });
@@ -60,7 +61,7 @@ export class TrackingIpRepository {
 
     const messageLocation: Message = {
       key: clientId,
-      value: JSON.stringify(output),
+      value: parseObjToString(output),
     };
 
     await producer.send({
