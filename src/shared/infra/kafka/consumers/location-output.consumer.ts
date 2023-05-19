@@ -11,7 +11,6 @@ export class LocationOutputConsumer {
 
     await consumer.connect();
     await consumer.subscribe({ topic: EKafkaTopics.LOCATION_OUTPUT });
-
     await consumer.run({ eachMessage });
   }
 }

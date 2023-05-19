@@ -4,7 +4,9 @@
   "description": "Kafka Stream",
   "scripts": {
     "test": "jest",
-    "start": "ts-node-dev ./src/shared/infra/kafka/consumers/event-input.consumer.ts",
+    "build": "tsc",
+    "start": "node ./dist/src/server.js",
+    "dev": "ts-node-dev ./src/server.ts",
     "helper:event-input-producer": "ts-node-dev ./src/helpers/get-dummy-event-input.helper.ts",
     "helper:location-output-consumer": "ts-node-dev ./src/helpers/get-location-output-logs.helper.ts"
   },

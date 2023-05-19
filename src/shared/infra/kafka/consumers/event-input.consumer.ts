@@ -1,31 +1,16 @@
-import { loggerInfo } from "../../../../utils/logger";
-import { kafka } from "../../../../configs/kafka.config";
-import { EventInput } from "../../../../models/EventInput";
-import { parseStringToObj } from "../../../../utils/parser";
-import { TrackingIpService } from "../../../../modules/trackingIp/trackingIp.service";
+import { EachMessageHandler } from "kafkajs";
 
 import { EKafkaTopics } from "../EKafkaTopics";
 import { EKafkaGroupId } from "../EKafkaGroupIds";
 
-(async () => {
-  const trackingIpService = new TrackingIpService();
+import { kafka } from "../../../../configs/kafka.config";
 
-  const consumer = kafka.consumer({
-    groupId: EKafkaGroupId.EVENT_INPUT,
-  });
+export class EventInputConsumer {
+  async consume(eachMessage: EachMessageHandler) {
+    const consumer = kafka.consumer({ groupId: EKafkaGroupId.EVENT_INPUT });
 
-  await consumer.connect();
-  await consumer.subscribe({ topic: EKafkaTopics.EVENTS_INPUT });
-
-  await consumer.run({
-    eachMessage: async ({ message, topic }) => {
-      loggerInfo({ log: `Receiving message: TOPIC: [${topic}]` });
-
-      const eventInput = parseStringToObj<EventInput>(
-        message.value?.toString() || ""
-      );
-
-      await trackingIpService.track(eventInput);
-    },
-  });
-})();
+    await consumer.connect();
+    await consumer.subscribe({ topic: EKafkaTopics.EVENTS_INPUT });
+    await consumer.run({ eachMessage });
+  }
+}
