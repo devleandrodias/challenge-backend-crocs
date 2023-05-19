@@ -3,7 +3,7 @@ import { kafka } from "../../configs/kafka.config";
 import { EventInput } from "../../models/EventInput";
 import { redisClient } from "../../configs/redis.config";
 import { LocationOutput } from "../../models/LocationOutput";
-import { EKafkaTopics } from "../../shared/enuns/EKafkaTopics";
+import { EKafkaTopics } from "../../shared/infra/kafka/EKafkaTopics";
 import { parseObjToString, parseStringToObj } from "../../utils/parser";
 
 export class TrackingIpRepository {
@@ -72,3 +72,9 @@ export class TrackingIpRepository {
     await producer.disconnect();
   }
 }
+
+// REDIS -> Cache
+
+// API -> Integracao
+
+// KAFKA -> Fila

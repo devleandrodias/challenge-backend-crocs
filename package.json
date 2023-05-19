@@ -6,7 +6,7 @@
     "test": "jest",
     "start": "ts-node-dev ./src/server.ts",
     "helper:event-input-producer": "ts-node-dev ./src/helpers/eventInput.producer.ts",
-    "helper:location-output-consumer": "ts-node-dev ./src/helpers/locationOutput.consumer.ts"
+    "helper:location-output-consumer": "ts-node-dev ./src/shared/infra/kafka/consumers/location-output.consumer.ts"
   },
   "keywords": [
     "kafka",

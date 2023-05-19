@@ -2,7 +2,7 @@ import { loggerInfo } from "./utils/logger";
 import { kafka } from "./configs/kafka.config";
 import { EventInput } from "./models/EventInput";
 import { parseStringToObj } from "./utils/parser";
-import { EKafkaTopics } from "./shared/enuns/EKafkaTopics";
+import { EKafkaTopics } from "./shared/infra/kafka/EKafkaTopics";
 import { TrackingIpService } from "./modules/trackingIp/trackingIp.service";
 
 (async () => {
