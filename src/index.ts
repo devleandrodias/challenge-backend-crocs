@@ -84,9 +84,13 @@ async function main() {
 
       // If not exists => Get data from api
       if (!locationOutputCache) {
-        console.log(`[IP: ${eventInput.ip}] - Not found in cache`);
+        console.log(`[IP: ${eventInput.ip}] - NOT found in cache`);
 
         // Get geographical locations by IP
+        console.log(
+          `[IP: ${eventInput.ip}] - Getting location informations from API`
+        );
+
         const locationOutputApi = await fakeApi(eventInput);
 
         // Set location in cache
@@ -94,6 +98,8 @@ async function main() {
 
         await producerLocationOutput(eventInput, locationOutputApi);
       }
+
+      redisClient.disconnect();
     },
   });
 }
