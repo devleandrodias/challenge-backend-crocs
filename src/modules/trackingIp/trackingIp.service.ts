@@ -1,7 +1,6 @@
 import { loggerInfo } from "../../utils/logger";
 import { EventInput } from "../../models/EventInput";
 import { redisClient } from "../../configs/redis.config";
-import { LocationOutput } from "../../models/LocationOutput";
 import { TrackingIpRepository } from "./trackingIp.repository";
 
 export class TrackingIpService {
@@ -11,64 +10,32 @@ export class TrackingIpService {
     this.trackingIpRepository = new TrackingIpRepository();
   }
 
-  async fakeApi(input: EventInput): Promise<LocationOutput> {
-    return {
-      ip: input.ip,
-      clientId: input.clientId,
-      timestamp: input.timestamp,
-      city: "San Francisco",
-      country: "United States",
-      region: "California",
-      latitude: 37.7749,
-      longitude: -122.4194,
-    };
-  }
-
-  async producerMessageIfFoundInCache(
-    input: EventInput,
-    output: LocationOutput
-  ) {
-    const { ip, clientId } = input;
-
-    loggerInfo({ log: `[IP: ${ip}] - Found in cache` });
-
-    await this.trackingIpRepository.saveLocation(clientId, output);
-  }
-
-  async producerMessageIfNotFoundInCache(input: EventInput) {
-    const { ip, clientId } = input;
-    const trackingIpRepository = new TrackingIpRepository();
-
-    loggerInfo({
-      log: `[IP: ${ip}] - NOT found in cache, getting location informations from API`,
-    });
-
-    const output = await this.fakeApi(input);
-
-    await redisClient.set(input.ip, JSON.stringify(output), {
-      EX: 30,
-      NX: true,
-    });
-
-    await trackingIpRepository.saveLocation(clientId, output);
-  }
-
   async track(eventInput: EventInput) {
-    redisClient.on("error", (err) => console.log("Redis Client Error", err));
+    const { ip, clientId } = eventInput;
 
-    await redisClient.connect();
+    const location = await this.trackingIpRepository.getLocationByCache(ip);
 
-    const locationOutputCache = await redisClient.get(eventInput.ip);
+    if (location) {
+      loggerInfo({ log: `[IP: ${ip}] - Found in cache` });
 
-    if (locationOutputCache) {
-      this.producerMessageIfFoundInCache(
-        eventInput,
-        JSON.parse(locationOutputCache) as LocationOutput
-      );
+      await this.trackingIpRepository.saveLocation(clientId, location);
     }
 
-    if (!locationOutputCache) {
-      this.producerMessageIfNotFoundInCache(eventInput);
+    if (!location) {
+      loggerInfo({
+        log: `[IP: ${ip}] - NOT found in cache, getting location informations from API`,
+      });
+
+      const output = await this.trackingIpRepository.getLocationByApi(
+        eventInput
+      );
+
+      await redisClient.set(ip, JSON.stringify(output), {
+        EX: 30,
+        NX: true,
+      });
+
+      await this.trackingIpRepository.saveLocation(clientId, output);
     }
 
     await redisClient.disconnect();
