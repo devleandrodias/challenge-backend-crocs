@@ -7,6 +7,7 @@ import { EventInput } from "./models/EventInput";
 import { LocationOutput } from "./models/LocationOutput";
 
 import { EKafkaTopics } from "./infrastructure/kafka/topics/EKafkaTopics";
+import { loggerInfo } from "./utils/logger";
 
 async function fakeApi(input: EventInput): Promise<LocationOutput> {
   return {
@@ -21,7 +22,6 @@ async function fakeApi(input: EventInput): Promise<LocationOutput> {
   };
 }
 
-// * Producer message on kafka topic (Output)
 async function producerLocationOutput(
   input: EventInput,
   output: LocationOutput
@@ -45,69 +45,63 @@ async function producerLocationOutput(
   await producer.disconnect();
 }
 
-async function main() {
-  // Read IPs from kafka topic consumer (Input)
-  const consumer = kafka.consumer({ groupId: "event-input" });
-
-  await consumer.connect();
-
-  await consumer.subscribe({
-    topic: EKafkaTopics.EVENTS_INPUT,
+async function producerMessageIfFoundInCache(
+  input: EventInput,
+  output: string
+) {
+  loggerInfo({
+    log: `[IP: ${input.ip}] - Found in cache`,
   });
+
+  await producerLocationOutput(input, JSON.parse(output));
+}
+
+async function producerMessageIfNotFoundInCache(input: EventInput) {
+  loggerInfo({
+    log: `[IP: ${input.ip}] - NOT found in cache`,
+  });
+
+  loggerInfo({
+    log: `[IP: ${input.ip}] - Getting location informations from API`,
+  });
+
+  const output = await fakeApi(input);
+
+  await redisClient.set(input.ip, JSON.stringify(output), { EX: 30, NX: true });
+
+  await producerLocationOutput(input, output);
+}
+
+(async () => {
+  const consumer = kafka.consumer({ groupId: "event-input" });
+  await consumer.connect();
+  await consumer.subscribe({ topic: EKafkaTopics.EVENTS_INPUT });
 
   await consumer.run({
     eachMessage: async ({ message, topic, partition }) => {
-      console.log(
-        `Receiving message: TOPIC: [${topic}] | Partition [${partition}]`
-      );
+      loggerInfo({
+        log: `Receiving message: TOPIC: [${topic}] | Partition [${partition}]`,
+      });
 
       const eventInput = JSON.parse(
         message.value?.toString() || ""
       ) as EventInput;
 
-      console.log(eventInput);
-
-      // Verify on cache if IP already exists
       redisClient.on("error", (err) => console.log("Redis Client Error", err));
 
       await redisClient.connect();
 
       const locationOutputCache = await redisClient.get(eventInput.ip);
 
-      // If exists => Get data from cache
       if (locationOutputCache) {
-        console.log(`[IP: ${eventInput.ip}] - Found in cache`);
-
-        await producerLocationOutput(
-          eventInput,
-          JSON.parse(locationOutputCache)
-        );
+        producerMessageIfFoundInCache(eventInput, locationOutputCache);
       }
 
-      // If not exists => Get data from api
       if (!locationOutputCache) {
-        console.log(`[IP: ${eventInput.ip}] - NOT found in cache`);
-
-        // Get geographical locations by IP
-        console.log(
-          `[IP: ${eventInput.ip}] - Getting location informations from API`
-        );
-
-        const locationOutputApi = await fakeApi(eventInput);
-
-        // Set location in cache
-        await redisClient.set(
-          eventInput.ip,
-          JSON.stringify(locationOutputApi),
-          { EX: 30, NX: true }
-        );
-
-        await producerLocationOutput(eventInput, locationOutputApi);
+        producerMessageIfNotFoundInCache(eventInput);
       }
 
       await redisClient.disconnect();
     },
   });
-}
-
-main();
+})();
