@@ -3,7 +3,7 @@ import { Message, Partitioners } from "kafkajs";
 
 import { kafka } from "../configs/kafka.config";
 import { EventInput } from "../models/EventInput";
-import { EKafkaTopics } from "../shared/infra/kafka/topics/EKafkaTopics";
+import { EKafkaTopics } from "../shared/enuns/EKafkaTopics";
 
 (async () => {
   const inputEventMock: EventInput = {

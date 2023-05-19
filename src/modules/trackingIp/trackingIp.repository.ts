@@ -3,7 +3,7 @@ import { kafka } from "../../configs/kafka.config";
 import { EventInput } from "../../models/EventInput";
 import { redisClient } from "../../configs/redis.config";
 import { LocationOutput } from "../../models/LocationOutput";
-import { EKafkaTopics } from "../../shared/infra/kafka/topics/EKafkaTopics";
+import { EKafkaTopics } from "../../shared/enuns/EKafkaTopics";
 
 export class TrackingIpRepository {
   async getLocationByCache(ip: string): Promise<LocationOutput | null> {

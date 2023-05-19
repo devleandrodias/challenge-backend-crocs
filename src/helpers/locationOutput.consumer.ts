@@ -1,6 +1,6 @@
 import { loggerInfo } from "../utils/logger";
 import { kafka } from "../configs/kafka.config";
-import { EKafkaTopics } from "../shared/infra/kafka/topics/EKafkaTopics";
+import { EKafkaTopics } from "../shared/enuns/EKafkaTopics";
 
 (async () => {
   const consumer = kafka.consumer({ groupId: "location-output" });

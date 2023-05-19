@@ -1,7 +1,7 @@
 import { loggerInfo } from "./utils/logger";
 import { kafka } from "./configs/kafka.config";
 import { EventInput } from "./models/EventInput";
-import { EKafkaTopics } from "./shared/infra/kafka/topics/EKafkaTopics";
+import { EKafkaTopics } from "./shared/enuns/EKafkaTopics";
 import { TrackingIpService } from "./modules/trackingIp/trackingIp.service";
 
 (async () => {
