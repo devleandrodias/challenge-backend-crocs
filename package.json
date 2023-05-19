@@ -5,7 +5,7 @@
   "scripts": {
     "test": "jest",
     "start": "ts-node-dev ./src/shared/infra/kafka/consumers/event-input.consumer.ts",
-    "helper:event-input-producer": "ts-node-dev ./src/shared/infra/kafka/producers/event-input.producer.ts",
+    "helper:event-input-producer": "ts-node-dev ./src/helpers/get-dummy-event-input.helper.ts",
     "helper:location-output-consumer": "ts-node-dev ./src/shared/infra/kafka/consumers/location-output.consumer.ts"
   },
   "keywords": [

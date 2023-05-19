@@ -1,10 +1,9 @@
-import { Message, Partitioners } from "kafkajs";
-import { kafka } from "../../configs/kafka.config";
 import { EventInput } from "../../models/EventInput";
 import { redisClient } from "../../configs/redis.config";
 import { LocationOutput } from "../../models/LocationOutput";
-import { EKafkaTopics } from "../../shared/infra/kafka/EKafkaTopics";
 import { parseObjToString, parseStringToObj } from "../../utils/parser";
+
+import { LocationOutputProducer } from "../../shared/infra/kafka/producers/location-output.producer";
 
 export class TrackingIpRepository {
   async getLocationByCache(ip: string): Promise<LocationOutput | null> {
@@ -53,23 +52,10 @@ export class TrackingIpRepository {
     clientId: string,
     output: LocationOutput
   ): Promise<void> {
-    const producer = kafka.producer({
-      createPartitioner: Partitioners.DefaultPartitioner,
-    });
-
-    await producer.connect();
-
-    const messageLocation: Message = {
+    await new LocationOutputProducer().produce({
       key: clientId,
       value: parseObjToString(output),
-    };
-
-    await producer.send({
-      topic: EKafkaTopics.LOCATION_OUTPUT,
-      messages: [messageLocation],
     });
-
-    await producer.disconnect();
   }
 }
 
