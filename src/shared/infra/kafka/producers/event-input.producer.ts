@@ -1,9 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { Message, Partitioners } from "kafkajs";
 
-import { kafka } from "../configs/kafka.config";
-import { EventInput } from "../models/EventInput";
-import { EKafkaTopics } from "../shared/infra/kafka/EKafkaTopics";
+import { kafka } from "../../../../configs/kafka.config";
+import { EventInput } from "../../../../models/EventInput";
+
+import { EKafkaTopics } from "../EKafkaTopics";
 
 (async () => {
   const inputEventMock: EventInput = {
