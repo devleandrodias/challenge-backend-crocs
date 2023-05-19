@@ -13,6 +13,8 @@ export class TrackingIpRepository {
 
     const location = await redisClient.get(ip);
 
+    await redisClient.disconnect();
+
     if (location === null) {
       return null;
     }
@@ -33,7 +35,23 @@ export class TrackingIpRepository {
     };
   }
 
-  async saveLocation(clientId: string, output: LocationOutput): Promise<void> {
+  async saveLocationOutputOnCache(ip: string, output: LocationOutput) {
+    redisClient.on("error", (err) => console.log("Redis Client Error", err));
+
+    await redisClient.connect();
+
+    await redisClient.set(ip, JSON.stringify(output), {
+      EX: 30,
+      NX: true,
+    });
+
+    await redisClient.disconnect();
+  }
+
+  async producerLocationOutput(
+    clientId: string,
+    output: LocationOutput
+  ): Promise<void> {
     const producer = kafka.producer({
       createPartitioner: Partitioners.DefaultPartitioner,
     });

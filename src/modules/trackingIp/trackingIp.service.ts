@@ -1,6 +1,5 @@
 import { loggerInfo } from "../../utils/logger";
 import { EventInput } from "../../models/EventInput";
-import { redisClient } from "../../configs/redis.config";
 import { TrackingIpRepository } from "./trackingIp.repository";
 
 export class TrackingIpService {
@@ -18,7 +17,10 @@ export class TrackingIpService {
     if (location) {
       loggerInfo({ log: `[IP: ${ip}] - Found in cache` });
 
-      await this.trackingIpRepository.saveLocation(clientId, location);
+      await this.trackingIpRepository.producerLocationOutput(
+        clientId,
+        location
+      );
     }
 
     if (!location) {
@@ -30,14 +32,12 @@ export class TrackingIpService {
         eventInput
       );
 
-      await redisClient.set(ip, JSON.stringify(output), {
-        EX: 30,
-        NX: true,
-      });
+      await this.trackingIpRepository.saveLocationOutputOnCache(
+        clientId,
+        output
+      );
 
-      await this.trackingIpRepository.saveLocation(clientId, output);
+      await this.trackingIpRepository.producerLocationOutput(clientId, output);
     }
-
-    await redisClient.disconnect();
   }
 }
