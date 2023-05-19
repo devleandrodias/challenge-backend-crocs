@@ -6,8 +6,8 @@ import { redisClient } from "./configs/redis.config";
 import { EventInput } from "./models/EventInput";
 import { LocationOutput } from "./models/LocationOutput";
 
-import { EKafkaTopics } from "./infrastructure/kafka/topics/EKafkaTopics";
 import { loggerInfo } from "./utils/logger";
+import { EKafkaTopics } from "./shared/infra/kafka/topics/EKafkaTopics";
 
 async function fakeApi(input: EventInput): Promise<LocationOutput> {
   return {

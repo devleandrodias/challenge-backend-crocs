@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Kafka Stream",
   "scripts": {
-    "util:data-test": "ts-node-dev ./src/utils/getRandomEventInput.ts",
-    "consumer:location": "ts-node-dev ./src/utils/consumerLocationOutput.ts",
+    "test": "jest",
     "start": "ts-node-dev ./src/index.ts",
-    "test": "jest"
+    "helper:event-input-producer": "ts-node-dev ./src/helpers/eventInput.producer.ts",
+    "helper:location-output-consumer": "ts-node-dev ./src/helpers/locationOutput.consumer.ts"
   },
   "keywords": [
     "kafka",
