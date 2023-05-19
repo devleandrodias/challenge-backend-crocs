@@ -1,5 +1,3 @@
-import { Message, Partitioners } from "kafkajs";
-
 import { kafka } from "./configs/kafka.config";
 import { redisClient } from "./configs/redis.config";
 
@@ -8,6 +6,7 @@ import { LocationOutput } from "./models/LocationOutput";
 
 import { loggerInfo } from "./utils/logger";
 import { EKafkaTopics } from "./shared/infra/kafka/topics/EKafkaTopics";
+import { TrackingIpRepository } from "./modules/trackingIp/trackingIp.repository";
 
 async function fakeApi(input: EventInput): Promise<LocationOutput> {
   return {
@@ -22,54 +21,29 @@ async function fakeApi(input: EventInput): Promise<LocationOutput> {
   };
 }
 
-async function producerLocationOutput(
+async function producerMessageIfFoundInCache(
   input: EventInput,
   output: LocationOutput
 ) {
-  const producer = kafka.producer({
-    createPartitioner: Partitioners.DefaultPartitioner,
-  });
+  const { ip, clientId } = input;
+  const trackingIpRepository = new TrackingIpRepository();
 
-  await producer.connect();
-
-  const messageLocation: Message = {
-    key: input.clientId,
-    value: JSON.stringify(output),
-  };
-
-  await producer.send({
-    topic: EKafkaTopics.LOCATION_OUTPUT,
-    messages: [messageLocation],
-  });
-
-  await producer.disconnect();
-}
-
-async function producerMessageIfFoundInCache(
-  input: EventInput,
-  output: string
-) {
-  loggerInfo({
-    log: `[IP: ${input.ip}] - Found in cache`,
-  });
-
-  await producerLocationOutput(input, JSON.parse(output));
+  loggerInfo({ log: `[IP: ${ip}] - Found in cache` });
+  await trackingIpRepository.saveLocation(clientId, output);
 }
 
 async function producerMessageIfNotFoundInCache(input: EventInput) {
-  loggerInfo({
-    log: `[IP: ${input.ip}] - NOT found in cache`,
-  });
+  const { ip, clientId } = input;
+  const trackingIpRepository = new TrackingIpRepository();
 
   loggerInfo({
-    log: `[IP: ${input.ip}] - Getting location informations from API`,
+    log: `[IP: ${ip}] - NOT found in cache, getting location informations from API`,
   });
 
   const output = await fakeApi(input);
 
   await redisClient.set(input.ip, JSON.stringify(output), { EX: 30, NX: true });
-
-  await producerLocationOutput(input, output);
+  await trackingIpRepository.saveLocation(clientId, output);
 }
 
 (async () => {
@@ -94,7 +68,10 @@ async function producerMessageIfNotFoundInCache(input: EventInput) {
       const locationOutputCache = await redisClient.get(eventInput.ip);
 
       if (locationOutputCache) {
-        producerMessageIfFoundInCache(eventInput, locationOutputCache);
+        producerMessageIfFoundInCache(
+          eventInput,
+          JSON.parse(locationOutputCache) as LocationOutput
+        );
       }
 
       if (!locationOutputCache) {
