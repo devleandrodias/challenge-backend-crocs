@@ -1,4 +1,4 @@
-import { Message } from "kafkajs";
+import { Message, Partitioners } from "kafkajs";
 
 import { kafka } from "./configs/kafka.config";
 import { redisClient } from "./configs/redis.config";
@@ -26,7 +26,9 @@ async function producerLocationOutput(
   input: EventInput,
   output: LocationOutput
 ) {
-  const producer = kafka.producer();
+  const producer = kafka.producer({
+    createPartitioner: Partitioners.DefaultPartitioner,
+  });
 
   await producer.connect();
 
@@ -94,12 +96,16 @@ async function main() {
         const locationOutputApi = await fakeApi(eventInput);
 
         // Set location in cache
-        redisClient.set(eventInput.ip, JSON.stringify(locationOutputApi));
+        await redisClient.set(
+          eventInput.ip,
+          JSON.stringify(locationOutputApi),
+          { EX: 30, NX: true }
+        );
 
         await producerLocationOutput(eventInput, locationOutputApi);
       }
 
-      redisClient.disconnect();
+      await redisClient.disconnect();
     },
   });
 }
