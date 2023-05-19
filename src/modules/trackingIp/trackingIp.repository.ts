@@ -1,9 +1,26 @@
 import { EventInput } from "../../models/EventInput";
 import { redisClient } from "../../configs/redis.config";
+import { geolocationApi } from "../../apis/geolocation.api";
 import { LocationOutput } from "../../models/LocationOutput";
 import { parseObjToString, parseStringToObj } from "../../utils/parser";
-
 import { LocationOutputProducer } from "../../shared/infra/kafka/producers/location-output.producer";
+
+type GeolocationResponse = {
+  status: string;
+  country: string;
+  countryCode: string;
+  region: string;
+  regionName: string;
+  city: string;
+  zip: string;
+  lat: number;
+  lon: number;
+  timezone: string;
+  isp: string;
+  org: string;
+  as: string;
+  query: string;
+};
 
 export class TrackingIpRepository {
   async getLocationByCache(ip: string): Promise<LocationOutput | null> {
@@ -23,15 +40,19 @@ export class TrackingIpRepository {
   }
 
   async getLocationByApi(eventInput: EventInput): Promise<LocationOutput> {
+    const { data } = await geolocationApi.get<GeolocationResponse>(
+      `${eventInput.ip}`
+    );
+
     return {
       ip: eventInput.ip,
       clientId: eventInput.clientId,
       timestamp: eventInput.timestamp,
-      city: "San Francisco",
-      country: "United States",
-      region: "California",
-      latitude: 37.7749,
-      longitude: -122.4194,
+      city: data.city,
+      country: data.country,
+      region: data.regionName,
+      latitude: data.lat,
+      longitude: data.lon,
     };
   }
 
@@ -58,9 +79,3 @@ export class TrackingIpRepository {
     });
   }
 }
-
-// REDIS -> Cache
-
-// API -> Integracao
-
-// KAFKA -> Fila

@@ -6,7 +6,7 @@ import { EventInputProducer } from "../shared/infra/kafka/producers/event-input.
   const inputEventMock: EventInput = {
     clientId: randomUUID(),
     timestamp: new Date().getTime(),
-    ip: "177.200.70.73",
+    ip: "39.167.59.72",
   };
 
   await new EventInputProducer().produce({
