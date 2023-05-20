@@ -66,10 +66,40 @@ function verifyOptionIsValid(option: string): boolean {
   return true;
 }
 
+async function translateOption(): Promise<string> {
+  const menuOptions: MenuOptions[] = [
+    { key: "1", description: "Translate from CSV file" },
+    { key: "2", description: "Translate from Sqlite" },
+    { key: "3", description: "Translate from external api" },
+    { key: "0", description: "Quit" },
+  ];
+
+  createOptionsMenu(menuOptions);
+
+  return new Promise((resolve) => {
+    rl.question(colors.yellow(`\nSelect an option: `), (answer) => {
+      switch (answer) {
+        case "1":
+          resolve("csv");
+          break;
+        case "2":
+          resolve("sqlite");
+          break;
+        case "0":
+          resolve("exit");
+          break;
+        default:
+          resolve("invalid");
+          break;
+      }
+    });
+  });
+}
+
 async function readDatasourceOption(): Promise<string> {
   const menuOptions: MenuOptions[] = [
-    { key: "1", description: "Read from CSV file" },
-    { key: "2", description: "Read from Sqlite" },
+    { key: "1", description: "Read datasource from CSV file" },
+    { key: "2", description: "Read datasource from Kafka topic" },
     { key: "0", description: "Quit" },
   ];
 
@@ -97,8 +127,9 @@ async function readDatasourceOption(): Promise<string> {
 
 async function writeOutputOption(): Promise<string> {
   const menuOptions: MenuOptions[] = [
-    { key: "1", description: "Write response in json file" },
-    { key: "2", description: "Write response in kafka topic" },
+    { key: "1", description: "Write in CSV file" },
+    { key: "2", description: "Write in Json file" },
+    { key: "3", description: "Write in Kafka topic" },
     { key: "0", description: "Quit" },
   ];
 
@@ -127,14 +158,21 @@ async function writeOutputOption(): Promise<string> {
 async function startCli() {
   console.clear();
 
-  showMenuTitle("--- [Backend Challenge] Crocs / [Input] ---\n");
+  showMenuTitle("--- [Backend Challenge] Crocs / [Translaton] ---\n");
+  const optionTranslation = await translateOption();
+  if (!verifyOptionIsValid(optionTranslation)) {
+    rl.close();
+    return;
+  }
+
+  showMenuTitle("--- [Backend Challenge] Crocs / [Input Stream] ---\n");
   const optionRead = await readDatasourceOption();
   if (!verifyOptionIsValid(optionRead)) {
     rl.close();
     return;
   }
 
-  showMenuTitle("--- [Backend Challenge] Crocs / [Output] ---\n");
+  showMenuTitle("--- [Backend Challenge] Crocs / [Output Stream] ---\n");
   const optionWrite = await writeOutputOption();
   if (!verifyOptionIsValid(optionWrite)) {
     rl.close();
