@@ -1,6 +1,7 @@
 import "reflect-metadata";
 
 import { container } from "tsyringe";
+
 import readline from "node:readline";
 
 import colors from "colors";
@@ -8,8 +9,8 @@ import colors from "colors";
 import { MenuOptions } from "../types/MenuOptions";
 import { CsvDatasource } from "../implementations/readers/CsvDatasource";
 import { TrackingIpService } from "../implementations/TrackingIpService";
-import { SqliteDatasource } from "../implementations/readers/SqliteDatasource";
 import { JsonFileWriter } from "../implementations/writers/JsonFileWriter";
+import { SqliteDatasource } from "../implementations/readers/SqliteDatasource";
 import { KafkaTopicWriter } from "../implementations/writers/KafkaTopicWriter";
 
 const rl = readline.createInterface({
@@ -17,10 +18,52 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-function createOptionsMenu(options: MenuOptions[]) {
+const datasourceOptions = {
+  csv: CsvDatasource,
+  sqlite: SqliteDatasource,
+};
+
+const writerOptions = {
+  json: JsonFileWriter,
+  kafka: KafkaTopicWriter,
+};
+
+function showMenuTitle(title: string): void {
+  console.log(colors.bold(colors.green(title)));
+}
+
+function createOptionsMenu(options: MenuOptions[]): void {
   options.forEach((op) => {
     console.log(colors.bold(`${op.key} - ${op.description}`));
   });
+}
+
+function resolveDepencies(optionRead: string, optionWrite: string): void {
+  container.register("DataSource", {
+    useClass: datasourceOptions[optionRead as "csv" | "sqlite"],
+  });
+
+  container.register("WriterOutput", {
+    useClass: writerOptions[optionWrite as "json" | "kafka"],
+  });
+
+  container.registerSingleton(TrackingIpService);
+}
+
+function verifyOptionIsValid(option: string): boolean {
+  console.clear();
+
+  if (option === "exit") {
+    console.log(colors.red("Exiting..."));
+    return false;
+  }
+
+  if (option === "invalid") {
+    console.log(colors.red("Invalid option. Please try again..."));
+    return false;
+  }
+
+  return true;
 }
 
 async function readDatasourceOption(): Promise<string> {
@@ -33,7 +76,7 @@ async function readDatasourceOption(): Promise<string> {
   createOptionsMenu(menuOptions);
 
   return new Promise((resolve) => {
-    rl.question(colors.yellow(`\nChoose the location source: `), (answer) => {
+    rl.question(colors.yellow(`\nSelect an option: `), (answer) => {
       switch (answer) {
         case "1":
           resolve("csv");
@@ -62,7 +105,7 @@ async function writeOutputOption(): Promise<string> {
   createOptionsMenu(menuOptions);
 
   return new Promise((resolve) => {
-    rl.question(colors.yellow(`\nChoose the location source: `), (answer) => {
+    rl.question(colors.yellow(`\nSelect an option: `), (answer) => {
       switch (answer) {
         case "1":
           resolve("json");
@@ -81,66 +124,26 @@ async function writeOutputOption(): Promise<string> {
   });
 }
 
-const datasourceOptions = {
-  csv: CsvDatasource,
-  sqlite: SqliteDatasource,
-};
-
-const writerOptions = {
-  json: JsonFileWriter,
-  kafka: KafkaTopicWriter,
-};
-
 async function startCli() {
   console.clear();
 
-  console.log(
-    colors.bold(
-      colors.green("--- Backend Crocs Stream Challenge - [Input] ---\n")
-    )
-  );
-
+  showMenuTitle("--- [Backend Challenge] Crocs / [Input] ---\n");
   const optionRead = await readDatasourceOption();
-
-  if (optionRead === "exit") {
-    console.clear();
-    console.log(colors.red("Exiting..."));
+  if (!verifyOptionIsValid(optionRead)) {
     rl.close();
     return;
   }
 
-  if (optionRead === "invalid") {
-    console.clear();
-    console.log(colors.red("Invalid option. Please try again..."));
-    rl.close();
-    return;
-  }
-
-  console.clear();
-
-  console.log(
-    colors.bold(
-      colors.green("--- Backend Crocs Stream Challenge - [Output] ---\n")
-    )
-  );
-
+  showMenuTitle("--- [Backend Challenge] Crocs / [Output] ---\n");
   const optionWrite = await writeOutputOption();
+  if (!verifyOptionIsValid(optionWrite)) {
+    rl.close();
+    return;
+  }
 
-  container.register("DataSource", {
-    useClass: datasourceOptions[optionRead as "csv" | "sqlite"],
-  });
+  resolveDepencies(optionRead, optionWrite);
 
-  container.register("WriterOutput", {
-    useClass: writerOptions[optionWrite as "json" | "kafka"],
-  });
-
-  container.registerSingleton(TrackingIpService);
-
-  const trackingIpService = container.resolve(TrackingIpService);
-
-  console.clear();
-
-  await trackingIpService.execute();
+  await container.resolve(TrackingIpService).execute();
 }
 
 startCli().then(() => {
