@@ -7,24 +7,43 @@ import readline from "node:readline";
 import colors from "colors";
 
 import { MenuOptions } from "../types/MenuOptions";
-import { CsvDatasource } from "../implementations/readers/CsvDatasource";
 import { TrackingIpService } from "../implementations/TrackingIpService";
-import { JsonFileWriter } from "../implementations/writers/JsonFileWriter";
-import { SqliteDatasource } from "../implementations/readers/SqliteDatasource";
+
+// Readers
+import { CsvDatasource } from "../implementations/readers/CsvDatasource";
+import { JsonlDatasource } from "../implementations/readers/JsonlDatasource";
+import { KafkaTopicDatasource } from "../implementations/readers/KafkaTopicDatasource";
+
+// Writers
+import { CsvWriter } from "../implementations/writers/CsvWriter";
+import { JsonlWriter } from "../implementations/writers/JsonlWriter";
 import { KafkaTopicWriter } from "../implementations/writers/KafkaTopicWriter";
+
+// Translators
+import { CsvTranslator } from "../implementations/translators/CsvTranslator";
+import { SqliteTranslator } from "../implementations/translators/SqliteTranslator";
+import { ExternalApiTranslator } from "../implementations/translators/ExternalApiTranslator";
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
+const translatorOptions = {
+  csv: CsvTranslator,
+  sqlite: SqliteTranslator,
+  externalApi: ExternalApiTranslator,
+};
+
 const datasourceOptions = {
   csv: CsvDatasource,
-  sqlite: SqliteDatasource,
+  jsonl: JsonlDatasource,
+  kafka: KafkaTopicDatasource,
 };
 
 const writerOptions = {
-  json: JsonFileWriter,
+  csv: CsvWriter,
+  jsonl: JsonlWriter,
   kafka: KafkaTopicWriter,
 };
 
@@ -38,13 +57,22 @@ function createOptionsMenu(options: MenuOptions[]): void {
   });
 }
 
-function resolveDepencies(optionRead: string, optionWrite: string): void {
+function resolveDepencies(
+  optionRead: string,
+  optionWrite: string,
+  optionTranslate: string
+): void {
   container.register("DataSource", {
-    useClass: datasourceOptions[optionRead as "csv" | "sqlite"],
+    useClass: datasourceOptions[optionRead as "csv" | "jsonl" | "kafka"],
   });
 
   container.register("WriterOutput", {
-    useClass: writerOptions[optionWrite as "json" | "kafka"],
+    useClass: writerOptions[optionWrite as "csv" | "jsonl" | "kafka"],
+  });
+
+  container.register("Translator", {
+    useClass:
+      translatorOptions[optionTranslate as "csv" | "sqlite" | "externalApi"],
   });
 
   container.registerSingleton(TrackingIpService);
@@ -68,8 +96,8 @@ function verifyOptionIsValid(option: string): boolean {
 
 async function translateOption(): Promise<string> {
   const menuOptions: MenuOptions[] = [
-    { key: "1", description: "Translate from CSV file" },
-    { key: "2", description: "Translate from Sqlite" },
+    { key: "1", description: "Translate from csv file" },
+    { key: "2", description: "Translate from sqlite" },
     { key: "3", description: "Translate from external api" },
     { key: "0", description: "Quit" },
   ];
@@ -98,8 +126,9 @@ async function translateOption(): Promise<string> {
 
 async function readDatasourceOption(): Promise<string> {
   const menuOptions: MenuOptions[] = [
-    { key: "1", description: "Read datasource from CSV file" },
-    { key: "2", description: "Read datasource from Kafka topic" },
+    { key: "1", description: "Read datasource from csv file" },
+    { key: "2", description: "Read datasource from jsonl file" },
+    { key: "3", description: "Read datasource from Kafka topic" },
     { key: "0", description: "Quit" },
   ];
 
@@ -127,9 +156,9 @@ async function readDatasourceOption(): Promise<string> {
 
 async function writeOutputOption(): Promise<string> {
   const menuOptions: MenuOptions[] = [
-    { key: "1", description: "Write in CSV file" },
-    { key: "2", description: "Write in Json file" },
-    { key: "3", description: "Write in Kafka topic" },
+    { key: "1", description: "Write in csv file" },
+    { key: "2", description: "Write in json file" },
+    { key: "3", description: "Write in topic topic" },
     { key: "0", description: "Quit" },
   ];
 
@@ -179,7 +208,7 @@ async function startCli() {
     return;
   }
 
-  resolveDepencies(optionRead, optionWrite);
+  resolveDepencies(optionRead, optionWrite, optionTranslation);
 
   await container.resolve(TrackingIpService).execute();
 }
