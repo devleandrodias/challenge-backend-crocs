@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 
-import { IWriter } from "../interfaces/IWriter";
+import { IWriter } from "../../interfaces/IWriter";
 
 @injectable()
 export class JsonlWriter implements IWriter {

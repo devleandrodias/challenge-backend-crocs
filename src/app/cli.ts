@@ -1,28 +1,26 @@
 import "reflect-metadata";
 
+import colors from "colors";
+import readline from "node:readline";
 import { container } from "tsyringe";
 
-import readline from "node:readline";
-
-import colors from "colors";
-
 import { MenuOptions } from "../types/MenuOptions";
-import { TrackingIpService } from "../implementations/TrackingIpService";
+import { TrackingIpService } from "../services/TrackingIpService";
 
 // Readers
-import { CsvDatasource } from "../implementations/readers/CsvDatasource";
-import { JsonlDatasource } from "../implementations/readers/JsonlDatasource";
-import { KafkaTopicDatasource } from "../implementations/readers/KafkaTopicDatasource";
+import { CsvDatasource } from "./readers/CsvDatasource";
+import { JsonlDatasource } from "./readers/JsonlDatasource";
+import { KafkaTopicDatasource } from "./readers/KafkaTopicDatasource";
 
 // Writers
-import { CsvWriter } from "../implementations/writers/CsvWriter";
-import { JsonlWriter } from "../implementations/writers/JsonlWriter";
-import { KafkaTopicWriter } from "../implementations/writers/KafkaTopicWriter";
+import { CsvWriter } from "./writers/CsvWriter";
+import { JsonlWriter } from "./writers/JsonlWriter";
+import { KafkaTopicWriter } from "./writers/KafkaTopicWriter";
 
 // Translators
-import { CsvTranslator } from "../implementations/translators/CsvTranslator";
-import { SqliteTranslator } from "../implementations/translators/SqliteTranslator";
-import { ExternalApiTranslator } from "../implementations/translators/ExternalApiTranslator";
+import { CsvTranslator } from "./translators/CsvTranslator";
+import { SqliteTranslator } from "./translators/SqliteTranslator";
+import { ExternalApiTranslator } from "./translators/ExternalApiTranslator";
 
 const rl = readline.createInterface({
   input: process.stdin,

@@ -1,4 +1,4 @@
-import { IWriter } from "../interfaces/IWriter";
+import { IWriter } from "../../interfaces/IWriter";
 
 export class CsvWriter implements IWriter {
   write(): Promise<void> {

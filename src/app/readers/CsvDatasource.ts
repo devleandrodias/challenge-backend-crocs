@@ -5,7 +5,7 @@ import { parse } from "csv-parse";
 import { injectable } from "tsyringe";
 
 import { loggerInfo } from "../../utils/logger";
-import { IDataSource } from "../interfaces/IDataSource";
+import { IDataSource } from "../../interfaces/IDataSource";
 import { DataSourceInput } from "../../types/DataSourceInput";
 
 @injectable()

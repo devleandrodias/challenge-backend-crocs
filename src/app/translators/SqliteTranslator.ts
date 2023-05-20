@@ -3,10 +3,9 @@ import sqlite3 from "sqlite3";
 import { Transform } from "node:stream";
 
 import { loggerInfo } from "../../utils/logger";
+import { ITranslator } from "../../interfaces/ITranslator";
 import { geolocationApi } from "../../apis/geolocation.api";
 import { GeolocationApiResponse } from "../../types/GeolocationApiResponse";
-
-import { ITranslator } from "../interfaces/ITranslator";
 
 export class SqliteTranslator implements ITranslator {
   async translate(): Promise<void> {

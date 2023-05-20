@@ -1,4 +1,4 @@
-import { ITranslator } from "../interfaces/ITranslator";
+import { ITranslator } from "../../interfaces/ITranslator";
 
 export class ExternalApiTranslator implements ITranslator {
   translate(): Promise<void> {
