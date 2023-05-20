@@ -14,7 +14,7 @@ export class SqliteTranslator implements ITranslator {
   async translate(input: DataSourceInput): Promise<GeolocationOutput> {
     loggerInfo({
       type: "info",
-      log: "Translating data using sqlite database...",
+      log: "[TRANSLATOR: Sqlite]: Translating data",
     });
 
     const databasePath = getFilePath(constants.TRANSLATOR_PATH, "IPs.sqlite");

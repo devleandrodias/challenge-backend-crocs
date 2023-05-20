@@ -12,7 +12,7 @@ export class ExternalApiTranslator implements ITranslator {
   async translate(input: DataSourceInput): Promise<GeolocationOutput> {
     loggerInfo({
       type: "info",
-      log: "Translating data using external api...",
+      log: "[TRANSLATOR: External API]: Translating data",
     });
 
     try {
