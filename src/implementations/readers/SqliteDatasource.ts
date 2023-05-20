@@ -6,12 +6,13 @@ import { Transform } from "node:stream";
 import { loggerInfo } from "../../utils/logger";
 import { IDataSource } from "../interfaces/IDataSource";
 import { geolocationApi } from "../../apis/geolocation.api";
+import { DataSourceInput } from "../../types/DataSourceInput";
 import { GeolocationApiResponse } from "../../types/GeolocationApiResponse";
 
 @injectable()
 export class SqliteDatasource implements IDataSource {
-  async read(): Promise<void> {
-    loggerInfo({ log: "Read data from sqlite database..." });
+  async read(): Promise<DataSourceInput[]> {
+    loggerInfo({ type: "info", log: "Read data from sqlite database..." });
 
     const databasePath = "src/data/IPs.sqlite";
     const filtOutputPath = "src/output/IPs-sqlite.json";
@@ -74,5 +75,7 @@ export class SqliteDatasource implements IDataSource {
         console.log("Conversion to JSON completed.");
       });
     });
+
+    return [];
   }
 }

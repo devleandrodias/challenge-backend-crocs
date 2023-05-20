@@ -8,7 +8,7 @@ import { EventInputConsumer } from "./shared/infra/kafka/consumers/event-input.c
   const trackingIpService = new TrackingIpService();
 
   await new EventInputConsumer().consume(async ({ message, topic }) => {
-    loggerInfo({ log: `Receiving message: TOPIC: [${topic}]` });
+    loggerInfo({ type: "info", log: `Receiving message: TOPIC: [${topic}]` });
 
     const eventInput = parseStringToObj<DataSourceInput>(
       message.value?.toString() || ""

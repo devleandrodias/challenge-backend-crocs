@@ -15,7 +15,10 @@ export class TrackingIpService {
     const location = await this.trackingIpRepository.getLocationByCache(ip);
 
     if (location) {
-      loggerInfo({ log: `[IP: ${ip}] - Found in cache` });
+      loggerInfo({
+        type: "info",
+        log: `[IP: ${ip}] - Found in cache`,
+      });
 
       await this.trackingIpRepository.producerLocationOutput(
         clientId,
@@ -25,6 +28,7 @@ export class TrackingIpService {
 
     if (!location) {
       loggerInfo({
+        type: "info",
         log: `[IP: ${ip}] - NOT found in cache, getting location informations from API`,
       });
 
