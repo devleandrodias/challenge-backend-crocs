@@ -1,6 +1,6 @@
 import { loggerInfo } from "./utils/logger";
-import { EventInput } from "./models/EventInput";
 import { parseStringToObj } from "./utils/parser";
+import { DataSourceInput } from "./types/DataSourceInput";
 import { TrackingIpService } from "./modules/trackingIp/trackingIp.service";
 import { EventInputConsumer } from "./shared/infra/kafka/consumers/event-input.consumer";
 
@@ -10,7 +10,7 @@ import { EventInputConsumer } from "./shared/infra/kafka/consumers/event-input.c
   await new EventInputConsumer().consume(async ({ message, topic }) => {
     loggerInfo({ log: `Receiving message: TOPIC: [${topic}]` });
 
-    const eventInput = parseStringToObj<EventInput>(
+    const eventInput = parseStringToObj<DataSourceInput>(
       message.value?.toString() || ""
     );
 

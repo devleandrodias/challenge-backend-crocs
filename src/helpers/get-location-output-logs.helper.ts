@@ -1,6 +1,6 @@
 import { loggerInfo } from "../utils/logger";
 import { parseStringToObj } from "../utils/parser";
-import { LocationOutput } from "../models/LocationOutput";
+import { GeolocationOutput } from "../types/GeolocationOutput";
 import { LocationOutputConsumer } from "../shared/infra/kafka/consumers/location-output.consumer";
 
 (async () => {
@@ -8,7 +8,7 @@ import { LocationOutputConsumer } from "../shared/infra/kafka/consumers/location
     loggerInfo({ log: `Receiving message: TOPIC: [${topic}]` });
 
     console.log(
-      parseStringToObj<LocationOutput>(message.value?.toString() || "")
+      parseStringToObj<GeolocationOutput>(message.value?.toString() || "")
     );
   });
 })();

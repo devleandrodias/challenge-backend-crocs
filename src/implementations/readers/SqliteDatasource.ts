@@ -6,7 +6,7 @@ import { Transform } from "node:stream";
 import { loggerInfo } from "../../utils/logger";
 import { IDataSource } from "../interfaces/IDataSource";
 import { geolocationApi } from "../../apis/geolocation.api";
-import { GeolocationResponse } from "../../types/GeolocationResponse";
+import { GeolocationApiResponse } from "../../types/GeolocationApiResponse";
 
 @injectable()
 export class SqliteDatasource implements IDataSource {
@@ -25,7 +25,9 @@ export class SqliteDatasource implements IDataSource {
       async transform(chunk, _, callback) {
         const { ip } = chunk;
 
-        const { data } = await geolocationApi.get<GeolocationResponse>(`${ip}`);
+        const { data } = await geolocationApi.get<GeolocationApiResponse>(
+          `${ip}`
+        );
 
         const obj = {
           ip,

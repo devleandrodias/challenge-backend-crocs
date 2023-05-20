@@ -1,13 +1,13 @@
-import { EventInput } from "../../models/EventInput";
 import { redisClient } from "../../configs/redis.config";
 import { geolocationApi } from "../../apis/geolocation.api";
-import { LocationOutput } from "../../models/LocationOutput";
 import { parseObjToString, parseStringToObj } from "../../utils/parser";
+import { GeolocationApiResponse } from "../../types/GeolocationApiResponse";
 import { LocationOutputProducer } from "../../shared/infra/kafka/producers/location-output.producer";
-import { GeolocationResponse } from "../../types/GeolocationResponse";
+import { DataSourceInput } from "../../types/DataSourceInput";
+import { GeolocationOutput } from "../../types/GeolocationOutput";
 
 export class TrackingIpRepository {
-  async getLocationByCache(ip: string): Promise<LocationOutput | null> {
+  async getLocationByCache(ip: string): Promise<GeolocationOutput | null> {
     redisClient.on("error", (err) => console.log("Redis Client Error", err));
 
     await redisClient.connect();
@@ -20,11 +20,13 @@ export class TrackingIpRepository {
       return null;
     }
 
-    return parseStringToObj<LocationOutput>(location);
+    return parseStringToObj<GeolocationOutput>(location);
   }
 
-  async getLocationByApi(eventInput: EventInput): Promise<LocationOutput> {
-    const { data } = await geolocationApi.get<GeolocationResponse>(
+  async getLocationByApi(
+    eventInput: DataSourceInput
+  ): Promise<GeolocationOutput> {
+    const { data } = await geolocationApi.get<GeolocationApiResponse>(
       `${eventInput.ip}`
     );
 
@@ -40,7 +42,7 @@ export class TrackingIpRepository {
     };
   }
 
-  async saveLocationOutputOnCache(ip: string, output: LocationOutput) {
+  async saveLocationOutputOnCache(ip: string, output: GeolocationOutput) {
     redisClient.on("error", (err) => console.log("Redis Client Error", err));
 
     await redisClient.connect();
@@ -55,7 +57,7 @@ export class TrackingIpRepository {
 
   async producerLocationOutput(
     clientId: string,
-    output: LocationOutput
+    output: GeolocationOutput
   ): Promise<void> {
     await new LocationOutputProducer().produce({
       key: clientId,

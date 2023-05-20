@@ -1,5 +1,5 @@
+import { DataSourceInput } from "../../types/DataSourceInput";
 import { loggerInfo } from "../../utils/logger";
-import { EventInput } from "../../models/EventInput";
 import { TrackingIpRepository } from "./trackingIp.repository";
 
 export class TrackingIpService {
@@ -9,7 +9,7 @@ export class TrackingIpService {
     this.trackingIpRepository = new TrackingIpRepository();
   }
 
-  async track(eventInput: EventInput) {
+  async track(eventInput: DataSourceInput) {
     const { ip, clientId } = eventInput;
 
     const location = await this.trackingIpRepository.getLocationByCache(ip);

@@ -1,4 +1,4 @@
-export type LocationOutput = {
+export type GeolocationOutput = {
   ip: string;
   clientId: string;
   timestamp: number;
