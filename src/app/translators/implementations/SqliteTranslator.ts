@@ -1,13 +1,13 @@
 import sqlite3 from "sqlite3";
 import { injectable } from "tsyringe";
 
-import { loggerInfo } from "../../utils/logger";
-import { constants } from "../constants/constants";
-import { getFilePath } from "../../utils/getFilePath";
-import { ITranslator } from "../../interfaces/ITranslator";
-import { DataSourceInput } from "../../types/DataSourceInput";
-import { GeolocationOutput } from "../../types/GeolocationOutput";
-import { GeolocationResponseSqlite } from "../../types/GeolocationSqliteResponse";
+import { ITranslator } from "../ITranslator";
+import { loggerInfo } from "../../../utils/logger";
+import { constants } from "../../constants/constants";
+import { getFilePath } from "../../../utils/getFilePath";
+import { DataSourceInput } from "../../../types/DataSourceInput";
+import { GeolocationOutput } from "../../../types/GeolocationOutput";
+import { GeolocationResponseSqlite } from "../../../types/GeolocationSqliteResponse";
 
 @injectable()
 export class SqliteTranslator implements ITranslator {

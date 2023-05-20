@@ -3,11 +3,11 @@ import { createWriteStream } from "node:fs";
 
 import { injectable } from "tsyringe";
 
-import { loggerInfo } from "../../utils/logger";
-import { IWriter } from "../../interfaces/IWriter";
-import { constants } from "../constants/constants";
-import { getFilePath } from "../../utils/getFilePath";
-import { GeolocationOutput } from "../../types/GeolocationOutput";
+import { IWriter } from "../IWriter";
+import { loggerInfo } from "../../../utils/logger";
+import { constants } from "../../constants/constants";
+import { getFilePath } from "../../../utils/getFilePath";
+import { GeolocationOutput } from "../../../types/GeolocationOutput";
 
 @injectable()
 export class JsonlWriter implements IWriter {
