@@ -5,9 +5,9 @@ import { ITranslator } from "../ITranslator";
 import { loggerInfo } from "../../../utils/logger";
 import { constants } from "../../constants/constants";
 import { getFilePath } from "../../../utils/getFilePath";
-import { DataSourceInput } from "../../../types/DataSourceInput";
-import { GeolocationOutput } from "../../../types/GeolocationOutput";
-import { GeolocationResponseSqlite } from "../../../types/GeolocationSqliteResponse";
+import { DataSourceInput } from "../../readers/types/DataSourceInput";
+import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
+import { GeolocationResponseSqlite } from "../types/GeolocationSqliteResponse";
 
 @injectable()
 export class SqliteTranslator implements ITranslator {

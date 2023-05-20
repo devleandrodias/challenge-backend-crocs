@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { DataSourceInput } from "../types/DataSourceInput";
+import { DataSourceInput } from "../app/readers/types/DataSourceInput";
 import { EventInputProducer } from "../shared/infra/kafka/producers/event-input.producer";
 
 (async () => {

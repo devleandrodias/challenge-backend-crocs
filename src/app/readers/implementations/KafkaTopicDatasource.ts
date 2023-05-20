@@ -1,6 +1,6 @@
 import { IDataSource } from "../IDataSource";
 import { loggerInfo } from "../../../utils/logger";
-import { DataSourceInput } from "../../../types/DataSourceInput";
+import { DataSourceInput } from "../types/DataSourceInput";
 
 export class KafkaTopicDatasource implements IDataSource {
   async read(): Promise<DataSourceInput[]> {

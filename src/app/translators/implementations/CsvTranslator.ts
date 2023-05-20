@@ -7,8 +7,8 @@ import { ITranslator } from "../ITranslator";
 import { loggerInfo } from "../../../utils/logger";
 import { constants } from "../../constants/constants";
 import { getFilePath } from "../../../utils/getFilePath";
-import { DataSourceInput } from "../../../types/DataSourceInput";
-import { GeolocationOutput } from "../../../types/GeolocationOutput";
+import { DataSourceInput } from "../../readers/types/DataSourceInput";
+import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
 
 @injectable()
 export class CsvTranslator implements ITranslator {

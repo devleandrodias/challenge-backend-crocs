@@ -2,7 +2,7 @@ import { injectable } from "tsyringe";
 
 import { IWriter } from "../IWriter";
 import { loggerInfo } from "../../../utils/logger";
-import { GeolocationOutput } from "../../../types/GeolocationOutput";
+import { GeolocationOutput } from "../types/GeolocationOutput";
 
 @injectable()
 export class KafkaTopicWriter implements IWriter {

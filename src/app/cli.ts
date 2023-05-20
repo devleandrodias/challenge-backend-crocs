@@ -4,7 +4,7 @@ import colors from "colors";
 import readline from "node:readline";
 import { container } from "tsyringe";
 
-import { MenuOptions } from "../types/MenuOptions";
+import { MenuOptions } from "../shared/types/MenuOptions";
 import { TrackingIpService } from "../services/TrackingIpService";
 
 // Readers

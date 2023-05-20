@@ -1,6 +1,6 @@
 import { loggerInfo } from "../utils/logger";
 import { parseStringToObj } from "../utils/parser";
-import { GeolocationOutput } from "../types/GeolocationOutput";
+import { GeolocationOutput } from "../app/writers/types/GeolocationOutput";
 import { LocationOutputConsumer } from "../shared/infra/kafka/consumers/location-output.consumer";
 
 (async () => {

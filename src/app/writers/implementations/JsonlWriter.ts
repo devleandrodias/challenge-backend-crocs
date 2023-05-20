@@ -7,7 +7,7 @@ import { IWriter } from "../IWriter";
 import { loggerInfo } from "../../../utils/logger";
 import { constants } from "../../constants/constants";
 import { getFilePath } from "../../../utils/getFilePath";
-import { GeolocationOutput } from "../../../types/GeolocationOutput";
+import { GeolocationOutput } from "../types/GeolocationOutput";
 
 @injectable()
 export class JsonlWriter implements IWriter {

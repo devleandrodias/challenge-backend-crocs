@@ -1,5 +1,5 @@
-import { DataSourceInput } from "../../types/DataSourceInput";
-import { GeolocationOutput } from "../../types/GeolocationOutput";
+import { DataSourceInput } from "../readers/types/DataSourceInput";
+import { GeolocationOutput } from "../writers/types/GeolocationOutput";
 
 export interface ITranslator {
   translate(input: DataSourceInput): Promise<GeolocationOutput>;
