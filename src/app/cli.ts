@@ -111,6 +111,8 @@ async function translateOption(): Promise<string> {
         case "2":
           resolve("sqlite");
           break;
+        case "3":
+          resolve("externalApi");
         case "0":
           resolve("exit");
           break;
@@ -139,7 +141,10 @@ async function readDatasourceOption(): Promise<string> {
           resolve("csv");
           break;
         case "2":
-          resolve("sqlite");
+          resolve("jsonl");
+          break;
+        case "3":
+          resolve("kafka");
           break;
         case "0":
           resolve("exit");
@@ -166,9 +171,12 @@ async function writeOutputOption(): Promise<string> {
     rl.question(colors.yellow(`\nSelect an option: `), (answer) => {
       switch (answer) {
         case "1":
-          resolve("json");
+          resolve("csv");
           break;
         case "2":
+          resolve("jsonl");
+          break;
+        case "3":
           resolve("kafka");
           break;
         case "0":

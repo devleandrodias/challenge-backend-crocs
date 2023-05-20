@@ -5,15 +5,21 @@ import { parse } from "csv-parse";
 import { injectable } from "tsyringe";
 
 import { loggerInfo } from "../../utils/logger";
+import { constants } from "../constants/constants";
+import { getFilePath } from "../../utils/getFilePath";
 import { IDataSource } from "../../interfaces/IDataSource";
 import { DataSourceInput } from "../../types/DataSourceInput";
 
 @injectable()
 export class CsvDatasource implements IDataSource {
   async read(): Promise<DataSourceInput[]> {
-    loggerInfo({ type: "info", log: "Reading data from CSV Reader..." });
+    loggerInfo({ type: "info", log: "Reading data from Csv Datasource..." });
 
-    const fileInputPath = "src/data/input.csv";
+    const fileInputPath = getFilePath(
+      constants.DATASOURCE_INPUT_PATH,
+      "input.csv"
+    );
+
     const dataSourceInput: DataSourceInput[] = [];
 
     const readStream = fs.createReadStream(fileInputPath);

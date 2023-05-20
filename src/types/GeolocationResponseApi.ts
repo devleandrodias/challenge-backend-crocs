@@ -1,4 +1,4 @@
-export type GeolocationApiResponse = {
+export type GeolocationResponseApi = {
   status: string;
   country: string;
   countryCode: string;

@@ -1,7 +1,7 @@
 import { redisClient } from "../../configs/redis.config";
 import { geolocationApi } from "../../apis/geolocation.api";
 import { parseObjToString, parseStringToObj } from "../../utils/parser";
-import { GeolocationApiResponse } from "../../types/GeolocationApiResponse";
+import { GeolocationResponseApi } from "../../types/GeolocationResponseApi";
 import { LocationOutputProducer } from "../../shared/infra/kafka/producers/location-output.producer";
 import { DataSourceInput } from "../../types/DataSourceInput";
 import { GeolocationOutput } from "../../types/GeolocationOutput";
@@ -26,7 +26,7 @@ export class TrackingIpRepository {
   async getLocationByApi(
     eventInput: DataSourceInput
   ): Promise<GeolocationOutput> {
-    const { data } = await geolocationApi.get<GeolocationApiResponse>(
+    const { data } = await geolocationApi.get<GeolocationResponseApi>(
       `${eventInput.ip}`
     );
 

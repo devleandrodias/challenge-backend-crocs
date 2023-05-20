@@ -1,76 +1,55 @@
-import fs from "node:fs";
 import sqlite3 from "sqlite3";
-import { Transform } from "node:stream";
+import { injectable } from "tsyringe";
 
 import { loggerInfo } from "../../utils/logger";
+import { constants } from "../constants/constants";
+import { getFilePath } from "../../utils/getFilePath";
 import { ITranslator } from "../../interfaces/ITranslator";
-import { geolocationApi } from "../../apis/geolocation.api";
-import { GeolocationApiResponse } from "../../types/GeolocationApiResponse";
+import { DataSourceInput } from "../../types/DataSourceInput";
+import { GeolocationOutput } from "../../types/GeolocationOutput";
+import { GeolocationResponseSqlite } from "../../types/GeolocationSqliteResponse";
 
+@injectable()
 export class SqliteTranslator implements ITranslator {
-  async translate(): Promise<void> {
-    loggerInfo({ type: "info", log: "Read data from sqlite database..." });
+  async translate(input: DataSourceInput): Promise<GeolocationOutput> {
+    loggerInfo({
+      type: "info",
+      log: "Translating data using sqlite database...",
+    });
 
-    const databasePath = "src/data/IPs.sqlite";
-    const filtOutputPath = "src/output/IPs-sqlite.json";
+    const databasePath = getFilePath(constants.TRANSLATOR_PATH, "IPs.sqlite");
 
     const db = new sqlite3.Database(databasePath);
 
-    const writeStream = fs.createWriteStream(filtOutputPath);
+    const query = `SELECT * FROM Ips WHERE ip = ?`;
 
-    const transformStream = new Transform({
-      objectMode: true,
-      async transform(chunk, _, callback) {
-        const { ip } = chunk;
+    return new Promise<GeolocationOutput>((resolve, reject) => {
+      db.get<GeolocationResponseSqlite>(query, [input.ip], (err, row) => {
+        if (err) {
+          loggerInfo({
+            type: "error",
+            log: `An error occurred while reading the data from sqlite`,
+          });
 
-        const { data } = await geolocationApi.get<GeolocationApiResponse>(
-          `${ip}`
-        );
+          reject(err);
+          return;
+        }
 
-        const obj = {
-          ip,
-          clientId: ip,
-          timestamp: Math.random() * 100,
-          city: data.city,
-          country: data.country,
-          region: data.regionName,
-          latitude: data.lat,
-          longitude: data.lon,
+        const geolocationOutput: GeolocationOutput = {
+          ip: input.ip,
+          clientId: input.clientId,
+          timestamp: input.timestamp,
+          city: row.city,
+          region: row.state,
+          country: row.country,
+          latitude: row.latitude,
+          longitude: row.longitude,
         };
 
-        this.push(JSON.stringify(obj) + "\n");
-
-        callback();
-      },
-    });
-
-    db.all("SELECT * FROM IPs", (err, rows) => {
-      if (err) {
-        console.error("An error occurred while reading the data:", err);
-        return;
-      }
-
-      transformStream.pipe(writeStream);
-
-      rows.forEach((row) => {
-        transformStream.write(row);
+        resolve(geolocationOutput);
       });
 
-      transformStream.end();
-
-      transformStream.on("end", () => {
-        console.log("Conversion to JSON completed.");
-        db.close();
-      });
-
-      transformStream.on("error", (error) => {
-        console.error("An error occurred during the conversion:", error);
-        db.close();
-      });
-
-      writeStream.on("finish", () => {
-        console.log("Conversion to JSON completed.");
-      });
+      db.close();
     });
   }
 }
