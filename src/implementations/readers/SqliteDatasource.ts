@@ -4,7 +4,7 @@ import { IDataSource } from "../interfaces/IDataSource";
 
 @injectable()
 export class SqliteDatasource implements IDataSource {
-  read(): void {
+  async read(): Promise<void> {
     loggerInfo({
       log: "Read data from sqlite database...",
     });

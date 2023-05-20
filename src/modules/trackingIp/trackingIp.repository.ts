@@ -4,23 +4,7 @@ import { geolocationApi } from "../../apis/geolocation.api";
 import { LocationOutput } from "../../models/LocationOutput";
 import { parseObjToString, parseStringToObj } from "../../utils/parser";
 import { LocationOutputProducer } from "../../shared/infra/kafka/producers/location-output.producer";
-
-type GeolocationResponse = {
-  status: string;
-  country: string;
-  countryCode: string;
-  region: string;
-  regionName: string;
-  city: string;
-  zip: string;
-  lat: number;
-  lon: number;
-  timezone: string;
-  isp: string;
-  org: string;
-  as: string;
-  query: string;
-};
+import { GeolocationResponse } from "../../types/GeolocationResponse";
 
 export class TrackingIpRepository {
   async getLocationByCache(ip: string): Promise<LocationOutput | null> {

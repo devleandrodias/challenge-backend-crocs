@@ -1,3 +1,3 @@
 export interface IDataSource {
-  read(): void;
+  read(): Promise<void>;
 }
