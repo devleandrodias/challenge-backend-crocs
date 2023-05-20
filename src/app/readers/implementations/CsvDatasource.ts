@@ -4,11 +4,11 @@ import { Transform } from "node:stream";
 import { parse } from "csv-parse";
 import { injectable } from "tsyringe";
 
-import { loggerInfo } from "../../utils/logger";
-import { constants } from "../constants/constants";
-import { getFilePath } from "../../utils/getFilePath";
-import { IDataSource } from "../../interfaces/IDataSource";
-import { DataSourceInput } from "../../types/DataSourceInput";
+import { IDataSource } from "../IDataSource";
+import { loggerInfo } from "../../../utils/logger";
+import { constants } from "../../constants/constants";
+import { getFilePath } from "../../../utils/getFilePath";
+import { DataSourceInput } from "../../../types/DataSourceInput";
 
 @injectable()
 export class CsvDatasource implements IDataSource {

@@ -1,5 +1,5 @@
 import { loggerInfo } from "../../utils/logger";
-import { IDataSource } from "../../interfaces/IDataSource";
+import { IDataSource } from "./IDataSource";
 import { DataSourceInput } from "../../types/DataSourceInput";
 
 export class KafkaTopicDatasource implements IDataSource {

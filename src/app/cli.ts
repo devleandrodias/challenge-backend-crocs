@@ -8,19 +8,19 @@ import { MenuOptions } from "../types/MenuOptions";
 import { TrackingIpService } from "../services/TrackingIpService";
 
 // Readers
-import { CsvDatasource } from "./readers/CsvDatasource";
-import { JsonlDatasource } from "./readers/JsonlDatasource";
-import { KafkaTopicDatasource } from "./readers/KafkaTopicDatasource";
+import { CsvDatasource } from "./readers/implementations/CsvDatasource";
+import { JsonlDatasource } from "./readers/implementations/JsonlDatasource";
+import { KafkaTopicDatasource } from "./readers/implementations/KafkaTopicDatasource";
 
 // Writers
-import { CsvWriter } from "./writers/CsvWriter";
-import { JsonlWriter } from "./writers/JsonlWriter";
-import { KafkaTopicWriter } from "./writers/KafkaTopicWriter";
+import { CsvWriter } from "./writers/implementations/CsvWriter";
+import { JsonlWriter } from "./writers/implementations/JsonlWriter";
+import { KafkaTopicWriter } from "./writers/implementations/KafkaTopicWriter";
 
 // Translators
-import { CsvTranslator } from "./translators/CsvTranslator";
-import { SqliteTranslator } from "./translators/SqliteTranslator";
-import { ExternalApiTranslator } from "./translators/ExternalApiTranslator";
+import { CsvTranslator } from "./translators/implementations/CsvTranslator";
+import { SqliteTranslator } from "./translators/implementations/SqliteTranslator";
+import { ExternalApiTranslator } from "./translators/implementations/ExternalApiTranslator";
 
 const rl = readline.createInterface({
   input: process.stdin,

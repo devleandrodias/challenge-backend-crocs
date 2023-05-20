@@ -1,8 +1,8 @@
 import { inject, injectable } from "tsyringe";
 
-import { IWriter } from "../interfaces/IWriter";
-import { IDataSource } from "../interfaces/IDataSource";
-import { ITranslator } from "../interfaces/ITranslator";
+import { IWriter } from "../app/writers/IWriter";
+import { IDataSource } from "../app/readers/IDataSource";
+import { ITranslator } from "../app/translators/ITranslator";
 
 @injectable()
 export class TrackingIpService {

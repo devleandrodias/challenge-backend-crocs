@@ -1,6 +1,6 @@
-import { loggerInfo } from "../../utils/logger";
-import { IDataSource } from "../../interfaces/IDataSource";
-import { DataSourceInput } from "../../types/DataSourceInput";
+import { IDataSource } from "../IDataSource";
+import { loggerInfo } from "../../../utils/logger";
+import { DataSourceInput } from "../../../types/DataSourceInput";
 
 export class JsonlDatasource implements IDataSource {
   async read(): Promise<DataSourceInput[]> {
