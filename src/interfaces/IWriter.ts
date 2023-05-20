@@ -1,3 +1,5 @@
+import { GeolocationOutput } from "../types/GeolocationOutput";
+
 export interface IWriter {
-  write(): Promise<void>;
+  write(localtion: GeolocationOutput): Promise<void>;
 }

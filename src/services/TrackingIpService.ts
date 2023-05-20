@@ -26,14 +26,14 @@ export class TrackingIpService {
   async execute() {
     await this._dataSource.read();
 
-    const response = await this._translator.translate({
+    const location = await this._translator.translate({
       ip: "149.107.176.192",
       clientId: "ee526cba-4846-5a1f-bd30-5397a63ce383",
       timestamp: 1684196954664,
     });
 
-    console.log(response);
+    console.log(location);
 
-    await this._writerOutput.write();
+    await this._writerOutput.write(location);
   }
 }

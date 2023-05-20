@@ -1,7 +1,15 @@
-import { IWriter } from "../../interfaces/IWriter";
+import { injectable } from "tsyringe";
 
+import { loggerInfo } from "../../utils/logger";
+import { IWriter } from "../../interfaces/IWriter";
+import { GeolocationOutput } from "../../types/GeolocationOutput";
+
+@injectable()
 export class CsvWriter implements IWriter {
-  write(): Promise<void> {
-    throw new Error("Method not implemented.");
+  async write(localtion: GeolocationOutput): Promise<void> {
+    loggerInfo({
+      type: "info",
+      log: "[WRITER: Csv]: Translating data",
+    });
   }
 }
