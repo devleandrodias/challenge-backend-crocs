@@ -9,7 +9,7 @@ export class KafkaTopicWriter implements IWriter {
   async write(localtion: GeolocationOutput): Promise<void> {
     loggerInfo({
       type: "info",
-      log: "[WRITER: Kafka]: Translating data",
+      log: "[WRITER: Kafka]: Writing data",
     });
   }
 }

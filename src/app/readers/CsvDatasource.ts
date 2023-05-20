@@ -13,7 +13,10 @@ import { DataSourceInput } from "../../types/DataSourceInput";
 @injectable()
 export class CsvDatasource implements IDataSource {
   async read(): Promise<DataSourceInput[]> {
-    loggerInfo({ type: "info", log: "Reading data from Csv Datasource..." });
+    loggerInfo({
+      type: "info",
+      log: "[READER: Csv]: Reading data",
+    });
 
     const fileInputPath = getFilePath(
       constants.DATASOURCE_INPUT_PATH,

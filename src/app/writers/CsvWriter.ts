@@ -9,7 +9,7 @@ export class CsvWriter implements IWriter {
   async write(localtion: GeolocationOutput): Promise<void> {
     loggerInfo({
       type: "info",
-      log: "[WRITER: Csv]: Translating data",
+      log: "[WRITER: Csv]: Writing data",
     });
   }
 }

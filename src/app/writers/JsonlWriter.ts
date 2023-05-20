@@ -14,7 +14,7 @@ export class JsonlWriter implements IWriter {
   async write(localtion: GeolocationOutput): Promise<void> {
     loggerInfo({
       type: "info",
-      log: "[WRITER: Jsonl]: Translating data",
+      log: "[WRITER: Jsonl]: Writing data",
     });
 
     const fileOutputPath = getFilePath(constants.OUTPUT_PATH, "output.jsonl");
