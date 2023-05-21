@@ -22,7 +22,7 @@ export class SqliteTranslator extends Transform {
   ): void {
     loggerInfo({
       type: "info",
-      log: "[TRANSLATOR: Sqlite]: Translating data",
+      log: `[TRANSLATOR: Sqlite]: Translating data - IP [${chunk.ip}]`,
     });
 
     const databasePath = getFilePath(constants.TRANSLATOR_PATH, "IPs.sqlite");
@@ -31,10 +31,10 @@ export class SqliteTranslator extends Transform {
 
     db.get<GeolocationResponseSqlite>(query, [chunk.ip], (err, row) => {
       if (err) {
-        loggerInfo({
-          type: "error",
-          log: `An error occurred while reading the data from sqlite`,
-        });
+        callback(
+          new Error("An error occurred while reading the data from sqlite")
+        );
+
         return;
       }
 

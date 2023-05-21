@@ -4,6 +4,8 @@ import { GeolocationOutput } from "../app/writers/types/GeolocationOutput";
 import { LocationOutputConsumer } from "../shared/infra/kafka/consumers/location-output.consumer";
 
 (async () => {
+  console.clear();
+
   await new LocationOutputConsumer().consume(async ({ message, topic }) => {
     loggerInfo({ type: "info", log: `Receiving message: TOPIC: [${topic}]` });
 

@@ -22,7 +22,6 @@ import { SqliteTranslator } from "./translators/implementations/SqliteTranslator
 import { ExternalApiTranslator } from "./translators/implementations/ExternalApiTranslator";
 
 // Services
-import { TrackingIpService } from "../services/TrackingIpService";
 import { TrackingIpPipeline } from "../services/TrackingIpPipeline";
 
 // ! Temp

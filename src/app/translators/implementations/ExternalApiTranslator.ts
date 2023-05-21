@@ -20,7 +20,7 @@ export class ExternalApiTranslator extends Transform {
   ): Promise<void> {
     loggerInfo({
       type: "info",
-      log: "[TRANSLATOR: External API]: Translating data",
+      log: `[TRANSLATOR: External API]: Translating data - IP [${chunk.ip}]`,
     });
 
     try {

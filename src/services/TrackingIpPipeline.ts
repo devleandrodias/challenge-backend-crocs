@@ -25,17 +25,31 @@ export class TrackingIpPipeline {
   async run(): Promise<void> {
     this._reader.pipe(this._translator).pipe(this._writer);
 
+    this._translator.on("finish", () => {
+      loggerInfo({
+        type: "success",
+        log: "[TRANSLATOR] - Successfully transformed!",
+      });
+    });
+
+    this._translator.on("error", (_) => {
+      loggerInfo({
+        type: "error",
+        log: "[TRANSLATOR] - Error when trying to transform",
+      });
+    });
+
     this._writer.on("finish", () => {
       loggerInfo({
         type: "success",
-        log: "Successfully written!",
+        log: "[WRITER] - Successfully written!",
       });
     });
 
     this._writer.on("error", (_) => {
       loggerInfo({
         type: "error",
-        log: "Error when trying to write",
+        log: "[WRITER] - Error when trying to write",
       });
     });
   }

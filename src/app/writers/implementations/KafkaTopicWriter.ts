@@ -1,7 +1,12 @@
 import { Writable } from "node:stream";
 import { injectable } from "tsyringe";
 
+import { Message, Partitioners } from "kafkajs";
 import { loggerInfo } from "../../../utils/logger";
+import { kafka } from "../../../configs/kafka.config";
+import { parseObjToString } from "../../../utils/parser";
+import { GeolocationOutput } from "../types/GeolocationOutput";
+import { EKafkaTopics } from "../../../shared/infra/kafka/EKafkaTopics";
 
 @injectable()
 export class KafkaTopicWriter extends Writable {
@@ -9,18 +14,43 @@ export class KafkaTopicWriter extends Writable {
     super({ objectMode: true });
   }
 
-  _write(
-    chunk: any,
-    encoding: BufferEncoding,
+  async _write(
+    chunk: GeolocationOutput,
+    _: BufferEncoding,
     callback: (error?: Error | null | undefined) => void
-  ): void {
+  ): Promise<void> {
     loggerInfo({
       type: "info",
-      log: "[WRITER: Kafka]: Writing data",
+      log: `[WRITER: Kafka]: Writing data - IP [${chunk.ip}]`,
     });
+
+    const producer = kafka.producer({
+      createPartitioner: Partitioners.DefaultPartitioner,
+    });
+
+    await producer.connect();
+
+    const key = chunk.clientId;
+
+    Reflect.deleteProperty(chunk, "clientId");
+
+    const value = parseObjToString<GeolocationOutput>(chunk);
+
+    const message: Message = { key, value };
+
+    await producer.send({
+      topic: EKafkaTopics.LOCATION_OUTPUT,
+      messages: [message],
+    });
+
+    await producer.disconnect();
+
+    callback(null);
   }
 
-  // Temporary files
+  // ! Temporary files
+
+  // * Obeter dados do cache
   // async getLocationByCache(ip: string): Promise<GeolocationOutput | null> {
   //   redisClient.on("error", (err) => console.log("Redis Client Error", err));
 
@@ -37,6 +67,7 @@ export class KafkaTopicWriter extends Writable {
   //   return parseStringToObj<GeolocationOutput>(location);
   // }
 
+  // * Obter dados da API Externa
   // async getLocationByApi(
   //   eventInput: DataSourceInput
   // ): Promise<GeolocationOutput> {
@@ -56,6 +87,7 @@ export class KafkaTopicWriter extends Writable {
   //   };
   // }
 
+  // * Salvar dados no cache
   // async saveLocationOutputOnCache(ip: string, output: GeolocationOutput) {
   //   redisClient.on("error", (err) => console.log("Redis Client Error", err));
 
@@ -67,15 +99,5 @@ export class KafkaTopicWriter extends Writable {
   //   });
 
   //   await redisClient.disconnect();
-  // }
-
-  // async producerLocationOutput(
-  //   clientId: string,
-  //   output: GeolocationOutput
-  // ): Promise<void> {
-  //   await new LocationOutputProducer().produce({
-  //     key: clientId,
-  //     value: parseObjToString(output),
-  //   });
   // }
 }
