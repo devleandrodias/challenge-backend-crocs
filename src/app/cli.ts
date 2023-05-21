@@ -9,7 +9,6 @@ import { MenuOptions } from "../shared/types/MenuOptions";
 // Readers
 import { CsvDatasource } from "./readers/implementations/CsvDatasource";
 import { JsonlDatasource } from "./readers/implementations/JsonlDatasource";
-import { KafkaTopicDatasource } from "./readers/implementations/KafkaTopicDatasource";
 
 // Writers
 import { CsvWriter } from "./writers/implementations/CsvWriter";
@@ -38,7 +37,6 @@ const translatorOptions = {
 const datasourceOptions = {
   csv: CsvDatasource,
   jsonl: JsonlDatasource,
-  kafka: KafkaTopicDatasource,
 };
 
 const writerOptions = {
@@ -63,7 +61,7 @@ function resolveDepencies(
   optionTranslate: string
 ): void {
   container.register("DataSource", {
-    useClass: datasourceOptions[optionRead as "csv" | "jsonl" | "kafka"],
+    useClass: datasourceOptions[optionRead as "csv" | "jsonl"],
   });
 
   container.register("WriterOutput", {
@@ -130,7 +128,6 @@ async function readDatasourceOption(): Promise<string> {
   const menuOptions: MenuOptions[] = [
     { key: "1", description: "Read datasource from csv file" },
     { key: "2", description: "Read datasource from jsonl file" },
-    { key: "3", description: "Read datasource from Kafka topic" },
     { key: "0", description: "Quit" },
   ];
 
@@ -144,9 +141,6 @@ async function readDatasourceOption(): Promise<string> {
           break;
         case "2":
           resolve("jsonl");
-          break;
-        case "3":
-          resolve("kafka");
           break;
         case "0":
           resolve("exit");
