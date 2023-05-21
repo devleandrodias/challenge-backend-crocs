@@ -26,7 +26,7 @@ import { TrackingIpService } from "../services/TrackingIpService";
 import { TrackingIpPipeline } from "../services/TrackingIpPipeline";
 
 // ! Temp
-import { TestReadable, TestWritable } from "../services/TestStream";
+import { TestReadable } from "../services/TestStream";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -72,8 +72,7 @@ function resolveDepencies(
   });
 
   container.register("WriterOutput", {
-    // useClass: writerOptions[optionWrite as "csv" | "jsonl" | "kafka"],
-    useClass: TestWritable,
+    useClass: writerOptions[optionWrite as "csv" | "jsonl" | "kafka"],
   });
 
   container.register("Translator", {

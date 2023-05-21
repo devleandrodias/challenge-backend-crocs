@@ -1,12 +1,19 @@
+import { Writable } from "node:stream";
 import { injectable } from "tsyringe";
 
-import { IWriter } from "../IWriter";
 import { loggerInfo } from "../../../utils/logger";
-import { GeolocationOutput } from "../types/GeolocationOutput";
 
 @injectable()
-export class KafkaTopicWriter implements IWriter {
-  async write(localtion: GeolocationOutput): Promise<void> {
+export class KafkaTopicWriter extends Writable {
+  constructor() {
+    super({ objectMode: true });
+  }
+
+  _write(
+    chunk: any,
+    encoding: BufferEncoding,
+    callback: (error?: Error | null | undefined) => void
+  ): void {
     loggerInfo({
       type: "info",
       log: "[WRITER: Kafka]: Writing data",
