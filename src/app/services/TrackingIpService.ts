@@ -1,10 +1,10 @@
 import { injectable, inject } from "tsyringe";
 import { Readable, Writable, Transform } from "node:stream";
 
-import { loggerInfo } from "../utils/logger";
+import { loggerInfo } from "../../utils/logger";
 
 @injectable()
-export class TrackingIpPipeline {
+export class TrackingIpService {
   private readonly _writer: Writable;
   private readonly _reader: Readable;
   private readonly _translator: Transform;

@@ -6,7 +6,7 @@ import { loggerInfo } from "../../../utils/logger";
 import { kafka } from "../../../configs/kafka.config";
 import { parseObjToString } from "../../../utils/parser";
 import { GeolocationOutput } from "../types/GeolocationOutput";
-import { EKafkaTopics } from "../../../shared/infra/kafka/EKafkaTopics";
+import { EKafkaTopics } from "../../../shared/enuns/EKafkaTopics";
 
 @injectable()
 export class KafkaTopicWriter extends Writable {

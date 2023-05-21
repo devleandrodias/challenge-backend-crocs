@@ -6,21 +6,17 @@ import { container } from "tsyringe";
 
 import { MenuOptions } from "../shared/types/MenuOptions";
 
-// Readers
 import { CsvDatasource } from "./readers/implementations/CsvDatasource";
 import { JsonlDatasource } from "./readers/implementations/JsonlDatasource";
 
-// Writers
 import { JsonlWriter } from "./writers/implementations/JsonlWriter";
 import { KafkaTopicWriter } from "./writers/implementations/KafkaTopicWriter";
 
-// Translators
 import { CsvTranslator } from "./translators/implementations/CsvTranslator";
 import { SqliteTranslator } from "./translators/implementations/SqliteTranslator";
 import { ExternalApiTranslator } from "./translators/implementations/ExternalApiTranslator";
 
-// Services
-import { TrackingIpPipeline } from "../services/TrackingIpPipeline";
+import { TrackingIpService } from "./services/TrackingIpService";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -71,7 +67,7 @@ function resolveDepencies(
       translatorOptions[optionTranslate as "csv" | "sqlite" | "externalApi"],
   });
 
-  container.registerSingleton(TrackingIpPipeline);
+  container.registerSingleton(TrackingIpService);
 }
 
 function verifyOptionIsValid(option: string): boolean {
@@ -206,7 +202,7 @@ async function startCli() {
 
   resolveDepencies(optionRead, optionWrite, optionTranslation);
 
-  await container.resolve(TrackingIpPipeline).run();
+  await container.resolve(TrackingIpService).run();
 }
 
 startCli().then(() => {
