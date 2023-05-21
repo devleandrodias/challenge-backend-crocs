@@ -21,6 +21,11 @@ import { KafkaTopicWriter } from "./writers/implementations/KafkaTopicWriter";
 import { CsvTranslator } from "./translators/implementations/CsvTranslator";
 import { SqliteTranslator } from "./translators/implementations/SqliteTranslator";
 import { ExternalApiTranslator } from "./translators/implementations/ExternalApiTranslator";
+import {
+  TestTransform,
+  TestWritable,
+} from "./translators/implementations/TestTranslator";
+import { TrackingIpPipeline } from "../services/TrackingIpPipeline";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -61,19 +66,21 @@ function resolveDepencies(
   optionTranslate: string
 ): void {
   container.register("DataSource", {
-    useClass: datasourceOptions[optionRead as "csv" | "jsonl" | "kafka"],
+    // useClass: datasourceOptions[optionRead as "csv" | "jsonl" | "kafka"],
+    useClass: CsvDatasource,
   });
 
   container.register("WriterOutput", {
-    useClass: writerOptions[optionWrite as "csv" | "jsonl" | "kafka"],
+    // useClass: writerOptions[optionWrite as "csv" | "jsonl" | "kafka"],
+    useClass: TestWritable,
   });
 
   container.register("Translator", {
-    useClass:
-      translatorOptions[optionTranslate as "csv" | "sqlite" | "externalApi"],
+    // useClass: translatorOptions[optionTranslate as "csv" | "sqlite" | "externalApi"],
+    useClass: TestTransform,
   });
 
-  container.registerSingleton(TrackingIpService);
+  container.registerSingleton(TrackingIpPipeline);
 }
 
 function verifyOptionIsValid(option: string): boolean {
@@ -216,7 +223,7 @@ async function startCli() {
 
   resolveDepencies(optionRead, optionWrite, optionTranslation);
 
-  await container.resolve(TrackingIpService).execute();
+  await container.resolve(TrackingIpPipeline).run();
 }
 
 startCli().then(() => {
