@@ -1,7 +1,7 @@
-import readline from "node:readline";
 import { Readable } from "node:stream";
 import { createReadStream } from "node:fs";
 
+import { parse } from "csv-parse";
 import { injectable } from "tsyringe";
 
 import { loggerInfo } from "../../../utils/logger";
@@ -23,26 +23,28 @@ export class CsvDatasource extends Readable {
       "input-test.csv"
     );
 
-    const rl = readline.createInterface({
-      input: createReadStream(fileInputPath),
-      output: process.stdout,
-      terminal: false,
-    });
+    let isFirstLine = true;
 
-    rl.on("line", (line) => {
-      const data: DataSourceInput = {
-        ip: "59.90.255.63",
-        timestamp: 1684196387094,
-        clientId: "1a301e29-6d6f-5e47-b130-e8fb5c0b1ee2",
-      };
+    createReadStream(fileInputPath)
+      .pipe(parse())
+      .on("data", (row) => {
+        if (isFirstLine) {
+          isFirstLine = false;
+          return;
+        }
 
-      console.log("READER: ", data);
+        const [timestamp, clientId, ip] = row;
 
-      this.push(data);
-    });
+        const data: DataSourceInput = {
+          ip,
+          clientId,
+          timestamp: Number(timestamp),
+        };
 
-    rl.on("close", () => {
-      this.push(null);
-    });
+        this.push(data);
+      })
+      .on("end", () => {
+        this.push(null);
+      });
   }
 }
