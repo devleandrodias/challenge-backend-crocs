@@ -5,8 +5,8 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "cli:dev": "ts-node-dev ./src/app/cli.ts",
-    "cli:prod": "node ./dist/src/app/cli.js",
+    "cli:dev": "ts-node-dev ./src/app/cli/index.ts",
+    "cli:prod": "node ./dist/src/app/cli/index.js",
     "helper:location-output": "ts-node-dev ./src/helpers/get-location-output-logs.helper.ts"
   },
   "keywords": [
