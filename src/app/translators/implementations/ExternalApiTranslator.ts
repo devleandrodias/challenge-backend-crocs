@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
+import { Transform } from "node:stream";
 
-import { ITranslator } from "../ITranslator";
 import { loggerInfo } from "../../../utils/logger";
 import { geolocationApi } from "../../../apis/geolocation.api";
 import { DataSourceInput } from "../../readers/types/DataSourceInput";
@@ -8,7 +8,7 @@ import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
 import { GeolocationResponseApi } from "../types/GeolocationResponseApi";
 
 @injectable()
-export class ExternalApiTranslator implements ITranslator {
+export class ExternalApiTranslator extends Transform {
   async translate(input: DataSourceInput): Promise<GeolocationOutput> {
     loggerInfo({
       type: "info",

@@ -1,9 +1,9 @@
 import fs from "node:fs";
+import { Transform } from "node:stream";
 
 import { parse } from "csv-parse";
 import { injectable } from "tsyringe";
 
-import { ITranslator } from "../ITranslator";
 import { loggerInfo } from "../../../utils/logger";
 import { constants } from "../../constants/constants";
 import { getFilePath } from "../../../utils/getFilePath";
@@ -11,7 +11,7 @@ import { DataSourceInput } from "../../readers/types/DataSourceInput";
 import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
 
 @injectable()
-export class CsvTranslator implements ITranslator {
+export class CsvTranslator extends Transform {
   async translate(input: DataSourceInput): Promise<GeolocationOutput> {
     loggerInfo({
       type: "info",

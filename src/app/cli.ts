@@ -76,8 +76,8 @@ function resolveDepencies(
   });
 
   container.register("Translator", {
-    // useClass: translatorOptions[optionTranslate as "csv" | "sqlite" | "externalApi"],
-    useClass: TestTransform,
+    useClass:
+      translatorOptions[optionTranslate as "csv" | "sqlite" | "externalApi"],
   });
 
   container.registerSingleton(TrackingIpPipeline);
