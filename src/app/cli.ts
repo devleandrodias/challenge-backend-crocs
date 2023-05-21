@@ -24,9 +24,6 @@ import { ExternalApiTranslator } from "./translators/implementations/ExternalApi
 // Services
 import { TrackingIpPipeline } from "../services/TrackingIpPipeline";
 
-// ! Temp
-import { TestReadable } from "../services/TestStream";
-
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -66,8 +63,7 @@ function resolveDepencies(
   optionTranslate: string
 ): void {
   container.register("DataSource", {
-    // useClass: datasourceOptions[optionRead as "csv" | "jsonl" | "kafka"],
-    useClass: TestReadable,
+    useClass: datasourceOptions[optionRead as "csv" | "jsonl" | "kafka"],
   });
 
   container.register("WriterOutput", {

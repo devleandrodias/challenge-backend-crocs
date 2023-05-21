@@ -25,6 +25,20 @@ export class TrackingIpPipeline {
   async run(): Promise<void> {
     this._reader.pipe(this._translator).pipe(this._writer);
 
+    this._reader.on("end", () => {
+      loggerInfo({
+        type: "success",
+        log: "[READER] - Data source successfully read!",
+      });
+    });
+
+    this._reader.on("error", () => {
+      loggerInfo({
+        type: "error",
+        log: "[READER] - An error occurred while trying to read from the database!",
+      });
+    });
+
     this._translator.on("finish", () => {
       loggerInfo({
         type: "success",
