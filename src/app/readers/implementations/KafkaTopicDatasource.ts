@@ -1,49 +1,47 @@
-import readline from "node:readline";
 import { Readable } from "node:stream";
-import { createReadStream } from "node:fs";
 
 import { loggerInfo } from "../../../utils/logger";
+import { kafka } from "../../../configs/kafka.config";
+import { parseStringToObj } from "../../../utils/parser";
 import { DataSourceInput } from "../types/DataSourceInput";
+import { KafkaDatasourceInput } from "../types/KafkaDatasourceInput";
+import { EKafkaTopics } from "../../../shared/infra/kafka/EKafkaTopics";
+import { EKafkaGroupId } from "../../../shared/infra/kafka/EKafkaGroupIds";
 
 export class KafkaTopicDatasource extends Readable {
   constructor() {
     super({ objectMode: true });
   }
 
-  _read(size: number): void {
+  async _read(): Promise<void> {
     loggerInfo({
       type: "info",
       log: `[READER: Kafka]: Reading data from kafka topic`,
     });
+
+    const consumer = kafka.consumer({ groupId: EKafkaGroupId.EVENT_INPUT });
+
+    await consumer.connect();
+    await consumer.subscribe({ topic: EKafkaTopics.EVENTS_INPUT });
+
+    await consumer.run({
+      eachMessage: async ({ message }) => {
+        const value = parseStringToObj<KafkaDatasourceInput>(
+          message.value?.toString() || ""
+        );
+
+        const dataSourceInput: DataSourceInput = {
+          ip: value.ip,
+          timestamp: value.timestamp,
+          clientId: message.key?.toString() || "",
+        };
+
+        this.push(dataSourceInput);
+      },
+    });
+
+    await consumer.disconnect();
+
+    this.push(null);
   }
 }
-
-// !Temporary files
-// const { ip, clientId } = eventInput;
-// const location = await this.trackingIpRepository.getLocationByCache(ip);
-// if (location) {
-//   loggerInfo({
-//     type: "info",
-//     log: `[IP: ${ip}] - Found in cache`,
-//   });
-//   await this.trackingIpRepository.producerLocationOutput(clientId, location);
-// }
-// if (!location) {
-//   loggerInfo({
-//     type: "info",
-//     log: `[IP: ${ip}] - NOT found in cache, getting location informations from API`,
-//   });
-//   const output = await this.trackingIpRepository.getLocationByApi(eventInput);
-//   await this.trackingIpRepository.saveLocationOutputOnCache(clientId, output);
-//   await this.trackingIpRepository.producerLocationOutput(clientId, output);
-// }
-
-// !Temporary files
-// const trackingIpService = new TrackingIpService();
-// await new EventInputConsumer().consume(async ({ message, topic }) => {
-//   loggerInfo({ type: "info", log: `Receiving message: TOPIC: [${topic}]` });
-//   const eventInput = parseStringToObj<DataSourceInput>(
-//     message.value?.toString() || ""
-//   );
-//   await trackingIpService.track(eventInput);
-// });

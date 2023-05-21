@@ -96,9 +96,9 @@ function verifyOptionIsValid(option: string): boolean {
 
 async function translateOption(): Promise<string> {
   const menuOptions: MenuOptions[] = [
-    { key: "1", description: "Translate from csv file" },
-    { key: "2", description: "Translate from sqlite" },
-    { key: "3", description: "Translate from external api" },
+    { key: "1", description: "Translate using csv file" },
+    { key: "2", description: "Translate using sqlite" },
+    { key: "3", description: "Translate using external api" },
     { key: "0", description: "Quit" },
   ];
 
