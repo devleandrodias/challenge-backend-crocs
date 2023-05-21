@@ -11,7 +11,6 @@ import { CsvDatasource } from "./readers/implementations/CsvDatasource";
 import { JsonlDatasource } from "./readers/implementations/JsonlDatasource";
 
 // Writers
-import { CsvWriter } from "./writers/implementations/CsvWriter";
 import { JsonlWriter } from "./writers/implementations/JsonlWriter";
 import { KafkaTopicWriter } from "./writers/implementations/KafkaTopicWriter";
 
@@ -40,7 +39,6 @@ const datasourceOptions = {
 };
 
 const writerOptions = {
-  csv: CsvWriter,
   jsonl: JsonlWriter,
   kafka: KafkaTopicWriter,
 };
@@ -65,7 +63,7 @@ function resolveDepencies(
   });
 
   container.register("WriterOutput", {
-    useClass: writerOptions[optionWrite as "csv" | "jsonl" | "kafka"],
+    useClass: writerOptions[optionWrite as "jsonl" | "kafka"],
   });
 
   container.register("Translator", {
@@ -155,9 +153,8 @@ async function readDatasourceOption(): Promise<string> {
 
 async function writeOutputOption(): Promise<string> {
   const menuOptions: MenuOptions[] = [
-    { key: "1", description: "Write in csv file" },
-    { key: "2", description: "Write in json file" },
-    { key: "3", description: "Write in topic topic" },
+    { key: "1", description: "Write in json file" },
+    { key: "2", description: "Write in topic topic" },
     { key: "0", description: "Quit" },
   ];
 
@@ -167,12 +164,9 @@ async function writeOutputOption(): Promise<string> {
     rl.question(colors.yellow(`\nSelect an option: `), (answer) => {
       switch (answer) {
         case "1":
-          resolve("csv");
-          break;
-        case "2":
           resolve("jsonl");
           break;
-        case "3":
+        case "2":
           resolve("kafka");
           break;
         case "0":
