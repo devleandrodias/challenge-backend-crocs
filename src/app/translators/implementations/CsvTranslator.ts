@@ -1,5 +1,5 @@
-import fs from "node:fs";
-import { Transform } from "node:stream";
+import { createReadStream } from "node:fs";
+import { Transform, TransformCallback } from "node:stream";
 
 import { parse } from "csv-parse";
 import { injectable } from "tsyringe";
@@ -12,45 +12,41 @@ import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
 
 @injectable()
 export class CsvTranslator extends Transform {
-  async translate(input: DataSourceInput): Promise<GeolocationOutput> {
+  constructor() {
+    super({ objectMode: true });
+  }
+
+  _transform(
+    chunk: DataSourceInput,
+    _: BufferEncoding,
+    callback: TransformCallback
+  ): void {
     loggerInfo({
       type: "info",
-      log: "[TRANSLATOR: Csv]: Translating data",
+      log: `[TRANSLATOR: Csv]: Translating data - IP [${chunk.ip}]`,
     });
 
-    return new Promise((resolve, reject) => {
-      const fileInputPath = getFilePath(constants.TRANSLATOR_PATH, "IPs.csv");
+    const fileInputPath = getFilePath(constants.TRANSLATOR_PATH, "IPs.csv");
 
-      const readStream = fs.createReadStream(fileInputPath, "utf-8");
+    const readStream = createReadStream(fileInputPath);
 
-      const csvStream = readStream.pipe(parse());
+    readStream.pipe(parse()).on("data", (row) => {
+      const [ip, latitude, longitude, country, state, city] = row;
 
-      let location: GeolocationOutput;
+      if (ip === chunk.ip) {
+        const location: GeolocationOutput = {
+          ip: chunk.ip,
+          clientId: chunk.clientId,
+          timestamp: chunk.timestamp,
+          city,
+          country,
+          region: state,
+          latitude: Number(latitude),
+          longitude: Number(longitude),
+        };
 
-      csvStream.on("data", (row: string) => {
-        const [ip, latitude, longitude, country, state, city] = row;
-
-        if (ip === input.ip) {
-          location = {
-            ip: input.ip,
-            clientId: input.clientId,
-            timestamp: input.timestamp,
-            city,
-            country,
-            region: state,
-            latitude: Number(latitude),
-            longitude: Number(longitude),
-          };
-        }
-      });
-
-      csvStream.on("end", () => {
-        resolve(location);
-      });
-
-      readStream.on("error", (error) => {
-        reject(error);
-      });
+        callback(null, location);
+      }
     });
   }
 }
