@@ -1,15 +1,23 @@
 import { injectable } from "tsyringe";
-import { Transform } from "node:stream";
+import { Transform, TransformCallback } from "node:stream";
 
 import { loggerInfo } from "../../../utils/logger";
 import { geolocationApi } from "../../../apis/geolocation.api";
 import { DataSourceInput } from "../../readers/types/DataSourceInput";
-import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
 import { GeolocationResponseApi } from "../types/GeolocationResponseApi";
+import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
 
 @injectable()
 export class ExternalApiTranslator extends Transform {
-  async translate(input: DataSourceInput): Promise<GeolocationOutput> {
+  constructor() {
+    super({ objectMode: true });
+  }
+
+  async _transform(
+    chunk: DataSourceInput,
+    _: BufferEncoding,
+    callback: TransformCallback
+  ): Promise<void> {
     loggerInfo({
       type: "info",
       log: "[TRANSLATOR: External API]: Translating data",
@@ -17,13 +25,13 @@ export class ExternalApiTranslator extends Transform {
 
     try {
       const { data } = await geolocationApi.get<GeolocationResponseApi>(
-        `${input.ip}`
+        `${chunk.ip}`
       );
 
       const geolocation: GeolocationOutput = {
-        ip: input.ip,
-        clientId: input.clientId,
-        timestamp: input.timestamp,
+        ip: chunk.ip,
+        clientId: chunk.clientId,
+        timestamp: chunk.timestamp,
         city: data.city,
         country: data.country,
         region: data.regionName,
@@ -31,9 +39,9 @@ export class ExternalApiTranslator extends Transform {
         longitude: data.lon,
       };
 
-      return geolocation;
+      callback(null, geolocation);
     } catch (error) {
-      throw new Error("An error occurred while calling external api...");
+      callback(new Error("Error on get data from external api.."));
     }
   }
 }
