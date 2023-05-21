@@ -5,7 +5,6 @@ import readline from "node:readline";
 import { container } from "tsyringe";
 
 import { MenuOptions } from "../shared/types/MenuOptions";
-import { TrackingIpService } from "../services/TrackingIpService";
 
 // Readers
 import { CsvDatasource } from "./readers/implementations/CsvDatasource";
@@ -21,11 +20,13 @@ import { KafkaTopicWriter } from "./writers/implementations/KafkaTopicWriter";
 import { CsvTranslator } from "./translators/implementations/CsvTranslator";
 import { SqliteTranslator } from "./translators/implementations/SqliteTranslator";
 import { ExternalApiTranslator } from "./translators/implementations/ExternalApiTranslator";
-import {
-  TestTransform,
-  TestWritable,
-} from "./translators/implementations/TestTranslator";
+
+// Services
+import { TrackingIpService } from "../services/TrackingIpService";
 import { TrackingIpPipeline } from "../services/TrackingIpPipeline";
+
+// ! Temp
+import { TestReadable, TestWritable } from "../services/TestStream";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -67,7 +68,7 @@ function resolveDepencies(
 ): void {
   container.register("DataSource", {
     // useClass: datasourceOptions[optionRead as "csv" | "jsonl" | "kafka"],
-    useClass: CsvDatasource,
+    useClass: TestReadable,
   });
 
   container.register("WriterOutput", {
