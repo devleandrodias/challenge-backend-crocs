@@ -86,3 +86,9 @@ Start CLI application (Production mode)
 You can use helper to consume messages from location-output topic
 
 > npm run helper:location-output 
+
+### Tests
+
+You can see coverage test project with next script
+
+> npm run test

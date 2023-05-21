@@ -1,6 +1,7 @@
 # Directories
 /dist
 /apps
+/coverage
 /downloads
 /node_modules
 
