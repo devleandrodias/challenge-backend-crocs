@@ -1,5 +1,7 @@
 # Directories
 /dist
+/apps
+/downloads
 /node_modules
 
 # Files

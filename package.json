@@ -5,11 +5,9 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "cli": "ts-node-dev ./src/app/cli.ts",
-    "start": "node ./dist/src/server.js",
-    "dev": "ts-node-dev ./src/server.ts",
-    "helper:event-input-producer": "ts-node-dev ./src/helpers/get-dummy-event-input.helper.ts",
-    "helper:location-output-consumer": "ts-node-dev ./src/helpers/get-location-output-logs.helper.ts"
+    "cli:dev": "ts-node-dev ./src/app/cli.ts",
+    "cli:prod": "node ./dist/src/app/cli.js",
+    "helper:location-output": "ts-node-dev ./src/helpers/get-location-output-logs.helper.ts"
   },
   "keywords": [
     "kafka",
@@ -17,6 +15,9 @@
   ],
   "author": "Leandro Dias",
   "license": "ISC",
+  "engines": {
+    "node": "18"
+  },
   "dependencies": {
     "axios": "^1.4.0",
     "colors": "^1.4.0",
