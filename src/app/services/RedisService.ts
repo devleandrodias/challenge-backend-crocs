@@ -8,11 +8,12 @@ import { GeolocationOutput } from "../writers/types/GeolocationOutput";
 export interface IRedisService {
   setLocation(location: GeolocationOutput): Promise<void>;
   getLocation(ip: string): Promise<GeolocationOutput | null>;
+  disconnect(): Promise<void>;
 }
 
 @injectable()
 export class RedisService implements IRedisService {
-  client: RedisClientType;
+  public client: RedisClientType;
 
   constructor() {
     this.client = createClient({
@@ -23,8 +24,10 @@ export class RedisService implements IRedisService {
   }
 
   async setLocation(location: GeolocationOutput): Promise<void> {
-    await this.client.set(location.ip, JSON.stringify(location));
-    await this.client.disconnect();
+    await this.client.set(location.ip, JSON.stringify(location), {
+      EX: 60,
+      NX: true,
+    });
   }
 
   async getLocation(ip: string): Promise<GeolocationOutput | null> {
@@ -34,8 +37,10 @@ export class RedisService implements IRedisService {
       return parseStringToObj<GeolocationOutput>(location);
     }
 
-    await this.client.disconnect();
-
     return null;
+  }
+
+  async disconnect(): Promise<void> {
+    return this.client.disconnect();
   }
 }

@@ -1,4 +1,4 @@
-import { container, inject, injectable } from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import { Transform, TransformCallback } from "node:stream";
 
 import { loggerInfo } from "../../../utils/logger";
@@ -31,34 +31,34 @@ export class ExternalApiTranslator extends Transform {
 
     if (locationInCache) {
       loggerInfo({
-        type: "info",
+        type: "warning",
         log: `[IP: ${chunk.ip}]: Already exists in cache`,
       });
 
       callback(null);
-    }
+    } else {
+      try {
+        const { data } = await geolocationApi.get<GeolocationResponseApi>(
+          `${chunk.ip}`
+        );
 
-    try {
-      const { data } = await geolocationApi.get<GeolocationResponseApi>(
-        `${chunk.ip}`
-      );
+        const geolocation: GeolocationOutput = {
+          ip: chunk.ip,
+          clientId: chunk.clientId,
+          timestamp: chunk.timestamp,
+          city: data.city,
+          country: data.country,
+          region: data.regionName,
+          latitude: data.lat,
+          longitude: data.lon,
+        };
 
-      const geolocation: GeolocationOutput = {
-        ip: chunk.ip,
-        clientId: chunk.clientId,
-        timestamp: chunk.timestamp,
-        city: data.city,
-        country: data.country,
-        region: data.regionName,
-        latitude: data.lat,
-        longitude: data.lon,
-      };
+        await this.redisService.setLocation(geolocation);
 
-      await this.redisService.setLocation(geolocation);
-
-      callback(null, geolocation);
-    } catch (error) {
-      callback(new Error("Error on get data from external api.."));
+        callback(null, geolocation);
+      } catch (error) {
+        callback(new Error("Error on get data from external api.."));
+      }
     }
   }
 }

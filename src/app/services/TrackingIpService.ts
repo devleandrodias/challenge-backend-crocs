@@ -9,62 +9,54 @@ export interface ITrackingIpService {
 
 @injectable()
 export class TrackingIpService {
-  private readonly _writer: Writable;
-  private readonly _reader: Readable;
-  private readonly _translator: Transform;
-
   constructor(
     // @ts-ignore
-    @inject("WriterOutput") writer: Writable,
+    @inject("WriterOutput") private writer: Writable,
     // @ts-ignore
-    @inject("DataSource") reader: Readable,
+    @inject("DataSource") private reader: Readable,
     // @ts-ignore
-    @inject("Translator") translator: Transform
-  ) {
-    this._writer = writer;
-    this._reader = reader;
-    this._translator = translator;
-  }
+    @inject("Translator") private translator: Transform
+  ) {}
 
   async run(): Promise<void> {
-    this._reader.pipe(this._translator).pipe(this._writer);
+    this.reader.pipe(this.translator).pipe(this.writer);
 
-    this._reader.on("end", () => {
+    this.reader.on("end", () => {
       loggerInfo({
         type: "success",
         log: "[READER] - Data source successfully read!",
       });
     });
 
-    this._reader.on("error", () => {
+    this.reader.on("error", () => {
       loggerInfo({
         type: "error",
         log: "[READER] - An error occurred while trying to read from the database!",
       });
     });
 
-    this._translator.on("finish", () => {
+    this.translator.on("finish", () => {
       loggerInfo({
         type: "success",
         log: "[TRANSLATOR] - Successfully transformed!",
       });
     });
 
-    this._translator.on("error", (_) => {
+    this.translator.on("error", () => {
       loggerInfo({
         type: "error",
         log: "[TRANSLATOR] - Error when trying to transform",
       });
     });
 
-    this._writer.on("finish", () => {
+    this.writer.on("finish", () => {
       loggerInfo({
         type: "success",
         log: "[WRITER] - Successfully written!",
       });
     });
 
-    this._writer.on("error", (_) => {
+    this.writer.on("error", () => {
       loggerInfo({
         type: "error",
         log: "[WRITER] - Error when trying to write",
