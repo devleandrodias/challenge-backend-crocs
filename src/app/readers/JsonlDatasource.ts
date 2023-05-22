@@ -21,7 +21,7 @@ export class JsonlDataSource extends Readable {
     });
 
     const fileInputPath = getFilePath(
-      constants.DATASOURCE_INPUT_TEST_PATH,
+      constants.DATASOURCE_INPUT_PATH,
       "input.jsonl"
     );
 
@@ -33,6 +33,10 @@ export class JsonlDataSource extends Readable {
 
     rl.on("line", (line) => {
       const row: JsonlDataSourceInput = JSON.parse(line);
+
+      if (!row.ip) {
+        return;
+      }
 
       const dataSourceInput: DataSourceInput = {
         ip: row.ip,

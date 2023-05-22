@@ -30,7 +30,7 @@ export class CsvDataSource extends Readable {
 
     const fileInputPath = getFilePath(
       constants.DATASOURCE_INPUT_PATH,
-      "input-test.csv"
+      "input.csv"
     );
 
     let isFirstLine = true;

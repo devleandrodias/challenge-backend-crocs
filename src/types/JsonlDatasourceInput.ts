@@ -1,5 +1,5 @@
 export type JsonlDataSourceInput = {
   id: string;
-  ip: string;
+  ip: string | null;
   timestamp: number;
 };
