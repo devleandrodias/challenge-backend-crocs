@@ -24,7 +24,11 @@ export class JsonlWriter extends Writable {
       log: `[WRITER: Jsonl]: Writing data - IP [${chunk.ip}]`,
     });
 
-    const fileOutputPath = getFilePath(constants.OUTPUT_PATH, "output.jsonl");
+    const fileOutputPath = getFilePath(
+      constants.OUTPUT_PATH_TESTS,
+      "output.jsonl"
+    );
+
     const writeStream = createWriteStream(fileOutputPath, { flags: "a" });
 
     writeStream.write(JSON.stringify(chunk) + "\n");
