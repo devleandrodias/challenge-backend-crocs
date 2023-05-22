@@ -1,6 +1,18 @@
 # Challenge Backend Crocs
 
-## Application Summary
+<p align="center">
+    <a href="https://croct.com">
+      <img src="https://cdn.croct.io/brand/logo/repo-icon-green.svg" alt="Croct" height="80"/>
+    </a>
+    <br />
+    <strong>Location Detector</strong>
+    <br />
+    An application that detects the visitor's location based on the IP address.
+</p>
+
+![Badge Conluída](http://img.shields.io/static/v1?label=STATUS&message=CONCLUIDO&color=GREEN&style=for-the-badge)
+
+## :dart: Application Summary
 This Node.js application is designed to read streaming data from various data sources in the form of IP numbers. It leverages the power of Node.js streams to efficiently process and transform the data. The application then interacts with an external API to perform specific operations with the IP numbers. Finally, the processed data is persisted for further analysis or usage.
 
 ### Key Features:
@@ -28,7 +40,7 @@ This Node.js application is designed to read streaming data from various data so
 - [x] Kafka Topic Writer 
 
 
-## Tools Used
+## :hammer: Tools Used
 
 - axios
 - colors
@@ -43,7 +55,7 @@ This Node.js application is designed to read streaming data from various data so
 - jest
 - typescript
 
-## How execute the project?
+## :zap: How execute the project?
 
 If you don't have kafa and redis you can download with next script
 
@@ -95,3 +107,7 @@ You can use helper to consume messages from location-output topic
 You can see coverage test project with next script
 
 > npm run test
+
+## :mailbox_with_mail: Contact
+
+To get in touch, send an email to <me@leandrodbdias.dev> or visit my website <https://leandrodbdias.dev>
