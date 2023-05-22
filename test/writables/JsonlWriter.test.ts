@@ -4,8 +4,8 @@ import { readFile, unlink } from "fs/promises";
 
 import { getFilePath } from "../../src/utils/getFilePath";
 import { constants } from "../../src/app/constants/constants";
-import { JsonlWriter } from "../../src/app/writers/implementations/JsonlWriter";
-import { GeolocationOutput } from "../../src/app/writers/types/GeolocationOutput";
+import { JsonlWriter } from "../../src/app/writers/JsonlWriter";
+import { GeolocationOutput } from "../../src/types/GeolocationOutput";
 
 describe("[JsonlWriter]", () => {
   let jsonlWriter: JsonlWriter;

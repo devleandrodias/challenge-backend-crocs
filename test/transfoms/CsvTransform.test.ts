@@ -1,7 +1,7 @@
 import "reflect-metadata";
 
 import { RedisService } from "../../src/app/services/RedisService";
-import { CsvTransform } from "../../src/app/transforms/implementations/CsvTransform";
+import { CsvTransform } from "../../src/app/transforms/CsvTransform";
 
 describe("[CsvTransform]", () => {
   let csvTransform: CsvTransform;

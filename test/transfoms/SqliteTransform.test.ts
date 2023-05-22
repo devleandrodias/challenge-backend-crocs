@@ -1,7 +1,7 @@
 import "reflect-metadata";
 
 import { RedisService } from "../../src/app/services/RedisService";
-import { SqliteTransform } from "../../src/app/transforms/implementations/SqliteTranslator";
+import { SqliteTransform } from "../../src/app/transforms/SqliteTranslator";
 
 describe("[SqliteTransform]", () => {
   let sqliteTransform: SqliteTransform;

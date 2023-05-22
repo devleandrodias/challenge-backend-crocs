@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Kafka Stream",
   "scripts": {
-    "test": "jest",
+    "test": "jest --silent",
     "build": "tsc",
     "cli:dev": "ts-node-dev ./src/app/cli/index.ts",
     "cli:prod": "node ./dist/src/app/cli/index.js",

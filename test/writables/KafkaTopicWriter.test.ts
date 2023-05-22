@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { KafkaTopicWriter } from "../../src/app/writers/implementations/KafkaTopicWriter";
+import { KafkaTopicWriter } from "../../src/app/writers/KafkaTopicWriter";
 
 describe("[KafkaTopicWriter]", () => {
   let kafkaTopicWriter: KafkaTopicWriter;

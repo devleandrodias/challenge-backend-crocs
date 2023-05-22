@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { CsvDataSource } from "../../src/app/readers/implementations/CsvDatasource";
+import { CsvDataSource } from "../../src/app/readers/CsvDatasource";
 
 describe("[CsvDataSource]", () => {
   let csvDataSource: CsvDataSource;

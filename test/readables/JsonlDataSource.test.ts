@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { JsonlDataSource } from "../../src/app/readers/implementations/JsonlDatasource";
+import { JsonlDataSource } from "../../src/app/readers/JsonlDatasource";
 
 describe("[JsonlDataSource]", () => {
   let jsonlDataSource: JsonlDataSource;

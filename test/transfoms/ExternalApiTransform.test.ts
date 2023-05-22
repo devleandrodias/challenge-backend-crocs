@@ -1,12 +1,12 @@
 import "reflect-metadata";
 
 import { geolocationApi } from "../../src/apis/geolocation.api";
+import { DataSourceInput } from "../../src/types/DataSourceInput";
 import { IRedisService } from "../../src/app/services/RedisService";
+import { GeolocationOutput } from "../../src/types/GeolocationOutput";
 import { RedisInMemoryService } from "../services/RedisInMemoryService";
-import { DataSourceInput } from "../../src/app/readers/types/DataSourceInput";
-import { GeolocationOutput } from "../../src/app/writers/types/GeolocationOutput";
-import { GeolocationResponseApi } from "../../src/app/transforms/types/GeolocationResponseApi";
-import { ExternalApiTransform } from "../../src/app/transforms/implementations/ExternalApiTransform";
+import { GeolocationResponseApi } from "../../src/types/GeolocationResponseApi";
+import { ExternalApiTransform } from "../../src/app/transforms/ExternalApiTransform";
 
 describe("[ExternalApiTransform]", () => {
   let redisService: IRedisService;
@@ -104,11 +104,11 @@ describe("[ExternalApiTransform]", () => {
       ip,
       clientId,
       timestamp,
-      city: "Whitehall",
-      region: "Ohio",
-      country: "United States",
-      latitude: 39.9747,
-      longitude: -82.8947,
+      city: geolocationResponseApi.city,
+      region: geolocationResponseApi.regionName,
+      country: geolocationResponseApi.country,
+      latitude: geolocationResponseApi.lat,
+      longitude: geolocationResponseApi.lon,
     };
 
     it("should parse data source data to geolotion output", async () => {

@@ -1,5 +1,5 @@
 import { IRedisService } from "../../src/app/services/RedisService";
-import { GeolocationOutput } from "../../src/app/writers/types/GeolocationOutput";
+import { GeolocationOutput } from "../../src/types/GeolocationOutput";
 
 export class RedisInMemoryService implements IRedisService {
   private geolocationOutputCache: GeolocationOutput[] = [];
