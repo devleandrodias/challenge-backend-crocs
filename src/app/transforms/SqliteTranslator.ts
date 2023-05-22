@@ -37,38 +37,38 @@ export class SqliteTransform extends Transform {
         log: `[IP: ${chunk.ip}]: Already exists in cache`,
       });
 
-      callback(null);
-    } else {
-      const databasePath = getFilePath(constants.TRANSLATOR_PATH, "IPs.sqlite");
-      const db = new sqlite3.Database(databasePath);
-      const query = `SELECT * FROM Ips WHERE ip = ?`;
-
-      db.get<GeolocationResponseSqlite>(query, [chunk.ip], async (err, row) => {
-        if (err) {
-          callback(
-            new Error("An error occurred while reading the data from sqlite")
-          );
-
-          return;
-        }
-
-        const geolocation: GeolocationOutput = {
-          ip: chunk.ip,
-          clientId: chunk.clientId,
-          timestamp: chunk.timestamp,
-          city: row.city,
-          region: row.state,
-          country: row.country,
-          latitude: row.latitude,
-          longitude: row.longitude,
-        };
-
-        await this.redisService.setLocation(geolocation);
-
-        callback(null, geolocation);
-      });
-
-      db.close();
+      callback();
+      return;
     }
+    const databasePath = getFilePath(constants.TRANSLATOR_PATH, "IPs.sqlite");
+    const db = new sqlite3.Database(databasePath);
+    const query = `SELECT * FROM Ips WHERE ip = ?`;
+
+    db.get<GeolocationResponseSqlite>(query, [chunk.ip], async (err, row) => {
+      if (err) {
+        callback(
+          new Error("An error occurred while reading the data from sqlite")
+        );
+
+        return;
+      }
+
+      const geolocation: GeolocationOutput = {
+        ip: chunk.ip,
+        clientId: chunk.clientId,
+        timestamp: chunk.timestamp,
+        city: row.city,
+        region: row.state,
+        country: row.country,
+        latitude: row.latitude,
+        longitude: row.longitude,
+      };
+
+      await this.redisService.setLocation(geolocation);
+
+      callback(null, geolocation);
+    });
+
+    db.close();
   }
 }
