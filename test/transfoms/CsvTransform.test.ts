@@ -42,62 +42,55 @@ describe("[CsvTransform]", () => {
     );
   });
 
-  it("should be defined", () => {
-    expect(csvTransform).toBeDefined();
+  const ip = "30.46.245.122";
+  const clientId = "95cdb0f2-9487-5bfd-aeda-bac27dd406fa";
+  const timestamp = new Date().getTime();
+
+  const geolotionInCache: GeolocationOutput = {
+    ip,
+    clientId,
+    timestamp,
+    city: "Columbus",
+    region: "Ohio",
+    country: "United States",
+    latitude: 39.97883,
+    longitude: -82.89573,
+  };
+
+  const chunk: DataSourceInput = {
+    ip,
+    clientId,
+    timestamp,
+  };
+
+  it("should return null if geolocation already exists in cache", async () => {
+    getLocationFromRedisSpy.mockResolvedValueOnce(geolotionInCache);
+
+    await csvTransform._transform(chunk, "utf-8", (error) => {
+      if (error) {
+        console.error(error);
+      }
+    });
+
+    expect(getLocationFromRedisSpy).toHaveBeenCalledWith(chunk.ip);
+    expect(setLocationFromRedisSpy).not.toHaveBeenCalled();
   });
 
-  describe("scenarios with geolocation already exists in cache", () => {
-    const ip = "30.46.245.122";
-    const clientId = "95cdb0f2-9487-5bfd-aeda-bac27dd406fa";
-    const timestamp = new Date().getTime();
+  it("should return empty callback if not found geolocation by ip", async () => {
+    getLocationFromRedisSpy.mockResolvedValueOnce(undefined);
+    getLocationFromCsvSpy.mockResolvedValueOnce(undefined);
 
-    const chunk: DataSourceInput = {
-      ip,
-      clientId,
-      timestamp,
-    };
-
-    const geolotionAlreadyInCache: GeolocationOutput = {
-      ip,
-      clientId,
-      timestamp,
-      city: "Columbus",
-      region: "Ohio",
-      country: "United States",
-      latitude: 39.97883,
-      longitude: -82.89573,
-    };
-
-    beforeAll(async () => {
-      await redisService.setLocation(geolotionAlreadyInCache);
+    await csvTransform._transform(chunk, "utf-8", (error) => {
+      if (error) {
+        console.error(error);
+      }
     });
 
-    afterAll(async () => {
-      await redisService.delLocation(ip);
-    });
-
-    it("should return null if geolocation already exists in cache", async () => {
-      await csvTransform._transform(chunk, "utf-8", (error) => {
-        if (error) {
-          console.error(error);
-        }
-      });
-
-      expect(getLocationFromRedisSpy).toHaveBeenCalledWith(chunk.ip);
-      expect(setLocationFromRedisSpy).not.toHaveBeenCalled();
-    });
+    expect(setLocationFromRedisSpy).not.toHaveBeenCalled();
   });
 
-  describe("scenarios without geolocation in cache", () => {
-    const ip = "30.46.245.122";
-    const clientId = "95cdb0f2-9487-5bfd-aeda-bac27dd406fa";
-    const timestamp = new Date().getTime();
-
-    const chunk: DataSourceInput = {
-      ip,
-      clientId,
-      timestamp,
-    };
+  it("should parse data source data to geolotion output", async () => {
+    getLocationFromRedisSpy.mockResolvedValueOnce(undefined);
 
     const geolocationResponseCsv: GeolocationResponseCsv = {
       ip,
@@ -108,7 +101,9 @@ describe("[CsvTransform]", () => {
       latitude: -82.8947,
     };
 
-    const geolotionNotInCache: GeolocationOutput = {
+    getLocationFromCsvSpy.mockResolvedValueOnce(geolocationResponseCsv);
+
+    const geolocationOutput: GeolocationOutput = {
       ip,
       clientId,
       timestamp,
@@ -119,19 +114,15 @@ describe("[CsvTransform]", () => {
       longitude: geolocationResponseCsv.longitude,
     };
 
-    it("should parse data source data to geolotion output", async () => {
-      getLocationFromCsvSpy.mockResolvedValueOnce(geolocationResponseCsv);
-
-      await csvTransform._transform(chunk, "utf-8", (error) => {
-        if (error) {
-          console.error(error);
-        }
-      });
-
-      expect(getLocationFromRedisSpy).toHaveBeenCalledWith(chunk.ip);
-      expect(setLocationFromRedisSpy).toHaveBeenCalledWith(geolotionNotInCache);
-
-      await redisService.delLocation(chunk.ip);
+    await csvTransform._transform(chunk, "utf-8", (error) => {
+      if (error) {
+        console.error(error);
+      }
     });
+
+    expect(getLocationFromRedisSpy).toHaveBeenCalledWith(chunk.ip);
+    expect(setLocationFromRedisSpy).toHaveBeenCalledWith(geolocationOutput);
+
+    await redisService.delLocation(chunk.ip);
   });
 });
