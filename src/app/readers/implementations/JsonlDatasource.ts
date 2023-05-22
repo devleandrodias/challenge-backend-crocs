@@ -8,7 +8,7 @@ import { getFilePath } from "../../../utils/getFilePath";
 import { DataSourceInput } from "../types/DataSourceInput";
 import { JsonlDataSourceInput } from "../types/JsonlDatasourceInput";
 
-export class JsonlDatasource extends Readable {
+export class JsonlDataSource extends Readable {
   constructor() {
     super({ objectMode: true });
   }

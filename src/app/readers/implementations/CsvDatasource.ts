@@ -10,7 +10,7 @@ import { getFilePath } from "../../../utils/getFilePath";
 import { DataSourceInput } from "../types/DataSourceInput";
 
 @injectable()
-export class CsvDatasource extends Readable {
+export class CsvDataSource extends Readable {
   constructor() {
     super({ objectMode: true });
   }

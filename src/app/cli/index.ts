@@ -13,16 +13,20 @@ import {
 } from "./cli.utils";
 
 import {
-  writerOptions,
-  datasourceOptions,
-  translatorOptions,
-} from "./cli.options";
-
-import {
   writersOptions,
   readMenuOptions,
   translateMenuOptions,
 } from "./cli.menus";
+
+import { CsvTranslator } from "../translators/implementations/CsvTranslator";
+import { SqliteTranslator } from "../translators/implementations/SqliteTranslator";
+import { ExternalApiTranslator } from "../translators/implementations/ExternalApiTranslator";
+
+import { CsvDataSource } from "../readers/implementations/CsvDatasource";
+import { JsonlDataSource } from "../readers/implementations/JsonlDatasource";
+
+import { JsonlWriter } from "../writers/implementations/JsonlWriter";
+import { KafkaTopicWriter } from "../writers/implementations/KafkaTopicWriter";
 
 import { IRedisService, RedisService } from "../services/RedisService";
 
@@ -58,18 +62,35 @@ async function startCli() {
     return;
   }
 
-  container.register("DataSource", {
-    useClass: datasourceOptions[optionRead as "csv" | "jsonl"],
-  });
+  switch (optionWrite) {
+    case "jsonl":
+      container.register("WriterOutput", { useClass: JsonlWriter });
+      break;
+    case "kafka":
+      container.register("WriterOutput", { useClass: KafkaTopicWriter });
+      break;
+  }
 
-  container.register("WriterOutput", {
-    useClass: writerOptions[optionWrite as "jsonl" | "kafka"],
-  });
+  switch (optionRead) {
+    case "csv":
+      container.register("DataSource", { useClass: CsvDataSource });
+      break;
+    case "jsonl":
+      container.register("DataSource", { useClass: JsonlDataSource });
+      break;
+  }
 
-  container.register("Translator", {
-    useClass:
-      translatorOptions[optionTranslate as "csv" | "sqlite" | "externalApi"],
-  });
+  switch (optionTranslate) {
+    case "csv":
+      container.register("Translator", { useClass: CsvTranslator });
+      break;
+    case "sqlite":
+      container.register("Translator", { useClass: SqliteTranslator });
+      break;
+    case "externalApi":
+      container.register("Translator", { useClass: ExternalApiTranslator });
+      break;
+  }
 
   container.registerSingleton<IRedisService>("RedisService", RedisService);
 

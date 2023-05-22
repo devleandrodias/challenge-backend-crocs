@@ -1,57 +1,74 @@
 import sqlite3 from "sqlite3";
-import { injectable } from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import { Transform, TransformCallback } from "node:stream";
 
 import { loggerInfo } from "../../../utils/logger";
 import { constants } from "../../constants/constants";
 import { getFilePath } from "../../../utils/getFilePath";
+import { IRedisService } from "../../services/RedisService";
 import { DataSourceInput } from "../../readers/types/DataSourceInput";
 import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
 import { GeolocationResponseSqlite } from "../types/GeolocationSqliteResponse";
 
 @injectable()
 export class SqliteTranslator extends Transform {
-  constructor() {
+  constructor(
+    // @ts-ignore
+    @inject("RedisService") private redisService: IRedisService
+  ) {
     super({ objectMode: true });
   }
 
-  _transform(
+  async _transform(
     chunk: DataSourceInput,
     _: BufferEncoding,
     callback: TransformCallback
-  ): void {
+  ): Promise<void> {
     loggerInfo({
       type: "info",
       log: `[TRANSLATOR: Sqlite]: Translating data - IP [${chunk.ip}]`,
     });
 
-    const databasePath = getFilePath(constants.TRANSLATOR_PATH, "IPs.sqlite");
-    const db = new sqlite3.Database(databasePath);
-    const query = `SELECT * FROM Ips WHERE ip = ?`;
+    const locationInCache = await this.redisService.getLocation(chunk.ip);
 
-    db.get<GeolocationResponseSqlite>(query, [chunk.ip], (err, row) => {
-      if (err) {
-        callback(
-          new Error("An error occurred while reading the data from sqlite")
-        );
+    if (locationInCache) {
+      loggerInfo({
+        type: "warning",
+        log: `[IP: ${chunk.ip}]: Already exists in cache`,
+      });
 
-        return;
-      }
+      callback(null);
+    } else {
+      const databasePath = getFilePath(constants.TRANSLATOR_PATH, "IPs.sqlite");
+      const db = new sqlite3.Database(databasePath);
+      const query = `SELECT * FROM Ips WHERE ip = ?`;
 
-      const geolocationOutput: GeolocationOutput = {
-        ip: chunk.ip,
-        clientId: chunk.clientId,
-        timestamp: chunk.timestamp,
-        city: row.city,
-        region: row.state,
-        country: row.country,
-        latitude: row.latitude,
-        longitude: row.longitude,
-      };
+      db.get<GeolocationResponseSqlite>(query, [chunk.ip], async (err, row) => {
+        if (err) {
+          callback(
+            new Error("An error occurred while reading the data from sqlite")
+          );
 
-      callback(null, geolocationOutput);
-    });
+          return;
+        }
 
-    db.close();
+        const geolocation: GeolocationOutput = {
+          ip: chunk.ip,
+          clientId: chunk.clientId,
+          timestamp: chunk.timestamp,
+          city: row.city,
+          region: row.state,
+          country: row.country,
+          latitude: row.latitude,
+          longitude: row.longitude,
+        };
+
+        await this.redisService.setLocation(geolocation);
+
+        callback(null, geolocation);
+      });
+
+      db.close();
+    }
   }
 }
