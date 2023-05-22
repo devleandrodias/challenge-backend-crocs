@@ -1,4 +1,4 @@
-export type GeolocationCsvResponse = {
+export type GeolocationResponseCsv = {
   ip: string;
   latitude: number;
   longitude: number;

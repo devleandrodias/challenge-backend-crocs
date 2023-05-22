@@ -1,10 +1,10 @@
 import { parse } from "csv-parse";
 import { createReadStream } from "node:fs";
 
-import { GeolocationCsvResponse } from "../types/GeolocationResponseCsv";
+import { GeolocationResponseCsv } from "../types/GeolocationResponseCsv";
 
 export interface ICsvService {
-  getLocationByIp(ip: string): Promise<GeolocationCsvResponse | null>;
+  getLocationByIp(ip: string): Promise<GeolocationResponseCsv | null>;
 }
 
 export class CsvService {
@@ -16,9 +16,9 @@ export class CsvService {
 
   async getLocationByIp(
     ipInput: string
-  ): Promise<GeolocationCsvResponse | null> {
+  ): Promise<GeolocationResponseCsv | null> {
     return new Promise((resolve) => {
-      let response: GeolocationCsvResponse | null = null;
+      let response: GeolocationResponseCsv | null = null;
 
       const readStream = createReadStream(this.filePath);
 
