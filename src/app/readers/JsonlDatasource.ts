@@ -14,15 +14,15 @@ export class JsonlDataSource extends Readable {
     super({ objectMode: true });
   }
 
-  _read(): void {
+  async _read(): Promise<void> {
     loggerInfo({
       type: "info",
-      log: `[READER: Jsonl]: Reading data from jsonl file`,
+      log: "[READER: Jsonl]: Reading data from jsonl file",
     });
 
     const fileInputPath = getFilePath(
-      constants.DATASOURCE_INPUT_PATH,
-      "input-test.jsonl"
+      constants.DATASOURCE_INPUT_TEST_PATH,
+      "input.jsonl"
     );
 
     const rl = readline.createInterface({

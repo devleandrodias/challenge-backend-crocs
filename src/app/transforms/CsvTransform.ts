@@ -38,31 +38,32 @@ export class CsvTransform extends Transform {
         log: `[IP: ${chunk.ip}]: Already exists in cache`,
       });
 
-      callback(null);
-    } else {
-      const fileInputPath = getFilePath(constants.TRANSLATOR_PATH, "IPs.csv");
-      const readStream = createReadStream(fileInputPath);
-
-      readStream.pipe(parse()).on("data", async (row) => {
-        const [ip, latitude, longitude, country, state, city] = row;
-
-        if (ip === chunk.ip) {
-          const geolocation: GeolocationOutput = {
-            ip: chunk.ip,
-            clientId: chunk.clientId,
-            timestamp: chunk.timestamp,
-            city,
-            country,
-            region: state,
-            latitude: Number(latitude),
-            longitude: Number(longitude),
-          };
-
-          await this.redisService.setLocation(geolocation);
-
-          callback(null, geolocation);
-        }
-      });
+      callback();
+      return;
     }
+
+    const fileInputPath = getFilePath(constants.TRANSLATOR_PATH, "IPs.csv");
+    const readStream = createReadStream(fileInputPath);
+
+    readStream.pipe(parse()).on("data", async (row) => {
+      const [ip, latitude, longitude, country, state, city] = row;
+
+      if (ip === chunk.ip) {
+        const geolocation: GeolocationOutput = {
+          ip: chunk.ip,
+          clientId: chunk.clientId,
+          timestamp: chunk.timestamp,
+          city,
+          country,
+          region: state,
+          latitude: Number(latitude),
+          longitude: Number(longitude),
+        };
+
+        await this.redisService.setLocation(geolocation);
+
+        callback(null, geolocation);
+      }
+    });
   }
 }
