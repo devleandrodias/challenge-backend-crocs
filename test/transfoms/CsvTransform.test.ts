@@ -8,6 +8,7 @@ import { CsvTransform } from "../../src/app/transforms/CsvTransform";
 import { GeolocationOutput } from "../../src/types/GeolocationOutput";
 import { RedisInMemoryService } from "../services/RedisInMemoryService";
 import { CsvService, ICsvService } from "../../src/services/CsvService";
+import { GeolocationResponseCsv } from "../../src/types/GeolocationResponseCsv";
 
 describe("[CsvTransform]", () => {
   let csvService: ICsvService;
@@ -15,8 +16,9 @@ describe("[CsvTransform]", () => {
 
   let csvTransform: CsvTransform;
 
-  let getLocationSpy: jest.SpyInstance;
-  let setLocationSpy: jest.SpyInstance;
+  let getLocationFromCsvSpy: jest.SpyInstance;
+  let getLocationFromRedisSpy: jest.SpyInstance;
+  let setLocationFromRedisSpy: jest.SpyInstance;
 
   beforeAll(() => {
     csvService = new CsvService(
@@ -27,8 +29,17 @@ describe("[CsvTransform]", () => {
 
     csvTransform = new CsvTransform(redisService, csvService);
 
-    getLocationSpy = jest.spyOn(RedisInMemoryService.prototype, "getLocation");
-    setLocationSpy = jest.spyOn(RedisInMemoryService.prototype, "setLocation");
+    getLocationFromCsvSpy = jest.spyOn(CsvService.prototype, "getLocationByIp");
+
+    getLocationFromRedisSpy = jest.spyOn(
+      RedisInMemoryService.prototype,
+      "getLocation"
+    );
+
+    setLocationFromRedisSpy = jest.spyOn(
+      RedisInMemoryService.prototype,
+      "setLocation"
+    );
   });
 
   it("should be defined", () => {
@@ -72,8 +83,55 @@ describe("[CsvTransform]", () => {
         }
       });
 
-      expect(getLocationSpy).toHaveBeenCalledWith(chunk.ip);
-      expect(setLocationSpy).not.toHaveBeenCalled();
+      expect(getLocationFromRedisSpy).toHaveBeenCalledWith(chunk.ip);
+      expect(setLocationFromRedisSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("scenarios without geolocation in cache", () => {
+    const ip = "30.46.245.122";
+    const clientId = "95cdb0f2-9487-5bfd-aeda-bac27dd406fa";
+    const timestamp = new Date().getTime();
+
+    const chunk: DataSourceInput = {
+      ip,
+      clientId,
+      timestamp,
+    };
+
+    const geolocationResponseCsv: GeolocationResponseCsv = {
+      ip,
+      state: "Ohio",
+      city: "Whitehall",
+      country: "United States",
+      longitude: 39.9747,
+      latitude: -82.8947,
+    };
+
+    const geolotionNotInCache: GeolocationOutput = {
+      ip,
+      clientId,
+      timestamp,
+      city: geolocationResponseCsv.city,
+      region: geolocationResponseCsv.state,
+      country: geolocationResponseCsv.country,
+      latitude: geolocationResponseCsv.latitude,
+      longitude: geolocationResponseCsv.longitude,
+    };
+
+    it("should parse data source data to geolotion output", async () => {
+      getLocationFromCsvSpy.mockResolvedValueOnce(geolocationResponseCsv);
+
+      await csvTransform._transform(chunk, "utf-8", (error) => {
+        if (error) {
+          console.error(error);
+        }
+      });
+
+      expect(getLocationFromRedisSpy).toHaveBeenCalledWith(chunk.ip);
+      expect(setLocationFromRedisSpy).toHaveBeenCalledWith(geolotionNotInCache);
+
+      await redisService.delLocation(chunk.ip);
     });
   });
 });
