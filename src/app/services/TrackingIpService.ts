@@ -3,6 +3,10 @@ import { Readable, Writable, Transform } from "node:stream";
 
 import { loggerInfo } from "../../utils/logger";
 
+export interface ITrackingIpService {
+  run(): Promise<void>;
+}
+
 @injectable()
 export class TrackingIpService {
   private readonly _writer: Writable;

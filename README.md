@@ -57,9 +57,12 @@ Start kafka server
 
 > sh scripts/start-kafka.sh
 
-Start redis server
+Install redis server
 
-> sh scripts/start-redis.sh
+> cd ./apps/redis-7.0.11/
+> sudo make install
+> cd utils
+> sudo ./install_server.sh
 
 Copy .env file
 

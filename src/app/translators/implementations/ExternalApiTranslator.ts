@@ -1,7 +1,8 @@
-import { injectable } from "tsyringe";
+import { container, inject, injectable } from "tsyringe";
 import { Transform, TransformCallback } from "node:stream";
 
 import { loggerInfo } from "../../../utils/logger";
+import { IRedisService } from "../../services/RedisService";
 import { geolocationApi } from "../../../apis/geolocation.api";
 import { DataSourceInput } from "../../readers/types/DataSourceInput";
 import { GeolocationResponseApi } from "../types/GeolocationResponseApi";
@@ -9,7 +10,10 @@ import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
 
 @injectable()
 export class ExternalApiTranslator extends Transform {
-  constructor() {
+  constructor(
+    // @ts-ignore
+    @inject("RedisService") private redisService: IRedisService
+  ) {
     super({ objectMode: true });
   }
 
@@ -22,6 +26,17 @@ export class ExternalApiTranslator extends Transform {
       type: "info",
       log: `[TRANSLATOR: External API]: Translating data - IP [${chunk.ip}]`,
     });
+
+    const locationInCache = await this.redisService.getLocation(chunk.ip);
+
+    if (locationInCache) {
+      loggerInfo({
+        type: "info",
+        log: `[IP: ${chunk.ip}]: Already exists in cache`,
+      });
+
+      callback(null);
+    }
 
     try {
       const { data } = await geolocationApi.get<GeolocationResponseApi>(
@@ -38,6 +53,8 @@ export class ExternalApiTranslator extends Transform {
         latitude: data.lat,
         longitude: data.lon,
       };
+
+      await this.redisService.setLocation(geolocation);
 
       callback(null, geolocation);
     } catch (error) {

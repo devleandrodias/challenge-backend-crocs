@@ -24,37 +24,20 @@ import {
   translateMenuOptions,
 } from "./cli.menus";
 
+import { IRedisService, RedisService } from "../services/RedisService";
+
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
-
-function resolveDepencies(
-  optionRead: string,
-  optionWrite: string,
-  optionTranslate: string
-): void {
-  container.register("DataSource", {
-    useClass: datasourceOptions[optionRead as "csv" | "jsonl"],
-  });
-
-  container.register("WriterOutput", {
-    useClass: writerOptions[optionWrite as "jsonl" | "kafka"],
-  });
-
-  container.register("Translator", {
-    useClass:
-      translatorOptions[optionTranslate as "csv" | "sqlite" | "externalApi"],
-  });
-}
 
 async function startCli() {
   console.clear();
 
   showMenuTitle("--- [Backend Challenge] Crocs / [Translaton] ---\n");
   createMenuOptions(translateMenuOptions);
-  const optionTranslation = await getMenuOptions(translateMenuOptions, rl);
-  if (!verifyOptionIsValid(optionTranslation)) {
+  const optionTranslate = await getMenuOptions(translateMenuOptions, rl);
+  if (!verifyOptionIsValid(optionTranslate)) {
     rl.close();
     return;
   }
@@ -75,8 +58,21 @@ async function startCli() {
     return;
   }
 
-  resolveDepencies(optionRead, optionWrite, optionTranslation);
-  container.registerSingleton(TrackingIpService);
+  container.register("DataSource", {
+    useClass: datasourceOptions[optionRead as "csv" | "jsonl"],
+  });
+
+  container.register("WriterOutput", {
+    useClass: writerOptions[optionWrite as "jsonl" | "kafka"],
+  });
+
+  container.register("Translator", {
+    useClass:
+      translatorOptions[optionTranslate as "csv" | "sqlite" | "externalApi"],
+  });
+
+  container.registerSingleton<IRedisService>("RedisService", RedisService);
+
   await container.resolve(TrackingIpService).run();
 }
 
