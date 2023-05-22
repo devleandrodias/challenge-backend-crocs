@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Kafka Stream",
   "scripts": {
-    "test": "jest --detectOpenHandles",
-    "test:silent": "jest --silent",
+    "test": "jest --silent",
     "build": "tsc",
     "cli:dev": "ts-node-dev ./src/cli/index.ts",
     "cli:prod": "node ./dist/src/cli/index.js",
