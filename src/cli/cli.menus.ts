@@ -1,4 +1,4 @@
-import { MenuOptions } from "../../shared/types/MenuOptions";
+import { MenuOptions } from "../shared/types/MenuOptions";
 
 export const translateMenuOptions: MenuOptions[] = [
   { key: "1", value: "csv", description: "Translate using csv file" },

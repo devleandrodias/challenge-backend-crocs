@@ -3,7 +3,7 @@ import "reflect-metadata";
 import readline from "node:readline";
 import { container } from "tsyringe";
 
-import { TrackingIpService } from "../services/TrackingIpService";
+import { TrackingIpService } from "../app/services/TrackingIpService";
 
 import {
   showMenuTitle,
@@ -18,17 +18,17 @@ import {
   translateMenuOptions,
 } from "./cli.menus";
 
-import { CsvDataSource } from "../readers/CsvDatasource";
-import { JsonlDataSource } from "../readers/JsonlDatasource";
+import { CsvDataSource } from "../app/readers/CsvDatasource";
+import { JsonlDataSource } from "../app/readers/JsonlDatasource";
 
-import { JsonlWriter } from "../writers/JsonlWriter";
-import { KafkaTopicWriter } from "../writers/KafkaTopicWriter";
+import { JsonlWriter } from "../app/writers/JsonlWriter";
+import { KafkaTopicWriter } from "../app/writers/KafkaTopicWriter";
 
-import { CsvTransform } from "../transforms/CsvTransform";
-import { SqliteTransform } from "../transforms/SqliteTranslator";
-import { ExternalApiTransform } from "../transforms/ExternalApiTransform";
+import { CsvTransform } from "../app/transforms/CsvTransform";
+import { SqliteTransform } from "../app/transforms/SqliteTranslator";
+import { ExternalApiTransform } from "../app/transforms/ExternalApiTransform";
 
-import { IRedisService, RedisService } from "../services/RedisService";
+import { IRedisService, RedisService } from "../app/services/RedisService";
 
 const rl = readline.createInterface({
   input: process.stdin,

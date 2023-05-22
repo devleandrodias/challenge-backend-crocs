@@ -1,7 +1,7 @@
 import colors from "colors";
 import readline from "node:readline";
 
-import { MenuOptions } from "../../shared/types/MenuOptions";
+import { MenuOptions } from "../shared/types/MenuOptions";
 
 export function showMenuTitle(title: string): void {
   console.log(colors.bold(colors.green(title)));
