@@ -18,17 +18,16 @@ import {
   translateMenuOptions,
 } from "./cli.menus";
 
-import { CsvTranslator } from "../translators/implementations/CsvTranslator";
-import { SqliteTranslator } from "../translators/implementations/SqliteTranslator";
-import { ExternalApiTranslator } from "../translators/implementations/ExternalApiTranslator";
-
-import { CsvDataSource } from "../readers/implementations/CsvDatasource";
-import { JsonlDataSource } from "../readers/implementations/JsonlDatasource";
-
 import { JsonlWriter } from "../writers/implementations/JsonlWriter";
 import { KafkaTopicWriter } from "../writers/implementations/KafkaTopicWriter";
 
+import { CsvTransform } from "../transforms/implementations/CsvTransform";
+import { SqliteTransform } from "../transforms/implementations/SqliteTransform";
+import { ExternalApiTransform } from "../transforms/implementations/ExternalApiTransform";
+
 import { IRedisService, RedisService } from "../services/RedisService";
+import { CsvDataSource } from "../readers/implementations/CsvDataSource";
+import { JsonlDataSource } from "../readers/implementations/JsonlDataSource";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -82,13 +81,13 @@ async function startCli() {
 
   switch (optionTranslate) {
     case "csv":
-      container.register("Translator", { useClass: CsvTranslator });
+      container.register("Translator", { useClass: CsvTransform });
       break;
     case "sqlite":
-      container.register("Translator", { useClass: SqliteTranslator });
+      container.register("Translator", { useClass: SqliteTransform });
       break;
     case "externalApi":
-      container.register("Translator", { useClass: ExternalApiTranslator });
+      container.register("Translator", { useClass: ExternalApiTransform });
       break;
   }
 

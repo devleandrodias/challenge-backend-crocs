@@ -1,17 +1,15 @@
-import sqlite3 from "sqlite3";
 import { inject, injectable } from "tsyringe";
 import { Transform, TransformCallback } from "node:stream";
 
 import { loggerInfo } from "../../../utils/logger";
-import { constants } from "../../constants/constants";
-import { getFilePath } from "../../../utils/getFilePath";
 import { IRedisService } from "../../services/RedisService";
+import { geolocationApi } from "../../../apis/geolocation.api";
 import { DataSourceInput } from "../../readers/types/DataSourceInput";
+import { GeolocationResponseApi } from "../types/GeolocationResponseApi";
 import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
-import { GeolocationResponseSqlite } from "../types/GeolocationSqliteResponse";
 
 @injectable()
-export class SqliteTranslator extends Transform {
+export class ExternalApiTransform extends Transform {
   constructor(
     // @ts-ignore
     @inject("RedisService") private redisService: IRedisService
@@ -26,7 +24,7 @@ export class SqliteTranslator extends Transform {
   ): Promise<void> {
     loggerInfo({
       type: "info",
-      log: `[TRANSLATOR: Sqlite]: Translating data - IP [${chunk.ip}]`,
+      log: `[TRANSLATOR: External API]: Translating data - IP [${chunk.ip}]`,
     });
 
     const locationInCache = await this.redisService.getLocation(chunk.ip);
@@ -39,36 +37,28 @@ export class SqliteTranslator extends Transform {
 
       callback(null);
     } else {
-      const databasePath = getFilePath(constants.TRANSLATOR_PATH, "IPs.sqlite");
-      const db = new sqlite3.Database(databasePath);
-      const query = `SELECT * FROM Ips WHERE ip = ?`;
-
-      db.get<GeolocationResponseSqlite>(query, [chunk.ip], async (err, row) => {
-        if (err) {
-          callback(
-            new Error("An error occurred while reading the data from sqlite")
-          );
-
-          return;
-        }
+      try {
+        const { data } = await geolocationApi.get<GeolocationResponseApi>(
+          `${chunk.ip}`
+        );
 
         const geolocation: GeolocationOutput = {
           ip: chunk.ip,
           clientId: chunk.clientId,
           timestamp: chunk.timestamp,
-          city: row.city,
-          region: row.state,
-          country: row.country,
-          latitude: row.latitude,
-          longitude: row.longitude,
+          city: data.city,
+          country: data.country,
+          region: data.regionName,
+          latitude: data.lat,
+          longitude: data.lon,
         };
 
         await this.redisService.setLocation(geolocation);
 
         callback(null, geolocation);
-      });
-
-      db.close();
+      } catch (error) {
+        callback(new Error("Error on get data from external api.."));
+      }
     }
   }
 }

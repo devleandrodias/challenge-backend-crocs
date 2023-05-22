@@ -12,7 +12,7 @@ import { DataSourceInput } from "../../readers/types/DataSourceInput";
 import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
 
 @injectable()
-export class CsvTranslator extends Transform {
+export class CsvTransform extends Transform {
   constructor(
     // @ts-ignore
     @inject("RedisService") private redisService: IRedisService
