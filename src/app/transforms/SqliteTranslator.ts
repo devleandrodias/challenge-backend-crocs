@@ -1,22 +1,30 @@
-import sqlite3 from "sqlite3";
-
 import { inject, injectable } from "tsyringe";
 import { Transform, TransformCallback } from "node:stream";
 
 import { loggerInfo } from "../../utils/logger";
 import { constants } from "../constants/constants";
 import { getFilePath } from "../../utils/getFilePath";
+import { IRedisService } from "../../services/RedisService";
 import { DataSourceInput } from "../../types/DataSourceInput";
 import { GeolocationOutput } from "../../types/GeolocationOutput";
-import { GeolocationResponseSqlite } from "../../types/GeolocationSqliteResponse";
+
+import {
+  ISqliteService,
+  SqliteService,
+} from "../../shared/infra/SqliteService";
 
 @injectable()
 export class SqliteTransform extends Transform {
   constructor(
     // @ts-ignore
-    @inject("RedisService") private redisService: IRedisService
+    @inject("RedisService") private redisService: IRedisService,
+    private sqliteService: ISqliteService
   ) {
     super({ objectMode: true });
+
+    this.sqliteService = new SqliteService(
+      getFilePath(constants.TRANSLATOR_PATH, "IPs.sqlite")
+    );
   }
 
   async _transform(
@@ -40,35 +48,33 @@ export class SqliteTransform extends Transform {
       callback();
       return;
     }
-    const databasePath = getFilePath(constants.TRANSLATOR_PATH, "IPs.sqlite");
-    const db = new sqlite3.Database(databasePath);
-    const query = `SELECT * FROM Ips WHERE ip = ?`;
 
-    db.get<GeolocationResponseSqlite>(query, [chunk.ip], async (err, row) => {
-      if (err) {
-        callback(
-          new Error("An error occurred while reading the data from sqlite")
-        );
+    try {
+      const location = await this.sqliteService.getLocation(chunk.ip);
 
+      if (!location) {
+        callback();
         return;
       }
 
-      const geolocation: GeolocationOutput = {
+      const geolocationOutput: GeolocationOutput = {
         ip: chunk.ip,
         clientId: chunk.clientId,
         timestamp: chunk.timestamp,
-        city: row.city,
-        region: row.state,
-        country: row.country,
-        latitude: row.latitude,
-        longitude: row.longitude,
+        city: location.city,
+        region: location.state,
+        country: location.country,
+        latitude: location.latitude,
+        longitude: location.longitude,
       };
 
-      await this.redisService.setLocation(geolocation);
+      await this.redisService.setLocation(geolocationOutput);
 
-      callback(null, geolocation);
-    });
-
-    db.close();
+      callback(null, geolocationOutput);
+    } catch (error) {
+      callback(
+        new Error("An error occurred while reading the data from sqlite")
+      );
+    }
   }
 }
