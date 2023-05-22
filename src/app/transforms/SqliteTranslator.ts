@@ -1,14 +1,14 @@
 import sqlite3 from "sqlite3";
+
 import { inject, injectable } from "tsyringe";
 import { Transform, TransformCallback } from "node:stream";
 
-import { loggerInfo } from "../../../utils/logger";
-import { constants } from "../../constants/constants";
-import { getFilePath } from "../../../utils/getFilePath";
-import { IRedisService } from "../../services/RedisService";
-import { DataSourceInput } from "../../readers/types/DataSourceInput";
-import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
-import { GeolocationResponseSqlite } from "../types/GeolocationSqliteResponse";
+import { loggerInfo } from "../../utils/logger";
+import { constants } from "../constants/constants";
+import { getFilePath } from "../../utils/getFilePath";
+import { DataSourceInput } from "../../types/DataSourceInput";
+import { GeolocationOutput } from "../../types/GeolocationOutput";
+import { GeolocationResponseSqlite } from "../../types/GeolocationSqliteResponse";
 
 @injectable()
 export class SqliteTransform extends Transform {

@@ -18,16 +18,17 @@ import {
   translateMenuOptions,
 } from "./cli.menus";
 
-import { JsonlWriter } from "../writers/implementations/JsonlWriter";
-import { KafkaTopicWriter } from "../writers/implementations/KafkaTopicWriter";
+import { CsvDataSource } from "../readers/CsvDatasource";
+import { JsonlDataSource } from "../readers/JsonlDatasource";
 
-import { CsvTransform } from "../transforms/implementations/CsvTransform";
-import { SqliteTransform } from "../transforms/implementations/SqliteTransform";
-import { ExternalApiTransform } from "../transforms/implementations/ExternalApiTransform";
+import { JsonlWriter } from "../writers/JsonlWriter";
+import { KafkaTopicWriter } from "../writers/KafkaTopicWriter";
+
+import { CsvTransform } from "../transforms/CsvTransform";
+import { SqliteTransform } from "../transforms/SqliteTranslator";
+import { ExternalApiTransform } from "../transforms/ExternalApiTransform";
 
 import { IRedisService, RedisService } from "../services/RedisService";
-import { CsvDataSource } from "../readers/implementations/CsvDataSource";
-import { JsonlDataSource } from "../readers/implementations/JsonlDataSource";
 
 const rl = readline.createInterface({
   input: process.stdin,

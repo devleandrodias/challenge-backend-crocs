@@ -3,10 +3,10 @@ import { createWriteStream } from "node:fs";
 
 import { injectable } from "tsyringe";
 
-import { loggerInfo } from "../../../utils/logger";
-import { constants } from "../../constants/constants";
-import { getFilePath } from "../../../utils/getFilePath";
-import { GeolocationOutput } from "../types/GeolocationOutput";
+import { loggerInfo } from "../../utils/logger";
+import { constants } from "../constants/constants";
+import { getFilePath } from "../../utils/getFilePath";
+import { GeolocationOutput } from "../../types/GeolocationOutput";
 
 @injectable()
 export class JsonlWriter extends Writable {

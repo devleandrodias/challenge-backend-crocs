@@ -4,12 +4,12 @@ import { Transform, TransformCallback } from "node:stream";
 import { parse } from "csv-parse";
 import { inject, injectable } from "tsyringe";
 
-import { loggerInfo } from "../../../utils/logger";
-import { constants } from "../../constants/constants";
-import { getFilePath } from "../../../utils/getFilePath";
-import { IRedisService } from "../../services/RedisService";
-import { DataSourceInput } from "../../readers/types/DataSourceInput";
-import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
+import { loggerInfo } from "../../utils/logger";
+import { constants } from "../constants/constants";
+import { getFilePath } from "../../utils/getFilePath";
+import { IRedisService } from "../services/RedisService";
+import { DataSourceInput } from "../../types/DataSourceInput";
+import { GeolocationOutput } from "../../types/GeolocationOutput";
 
 @injectable()
 export class CsvTransform extends Transform {

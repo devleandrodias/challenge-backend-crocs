@@ -3,7 +3,7 @@ import { RedisClientType, createClient } from "redis";
 
 import { envs } from "../../configs/env.config";
 import { parseStringToObj } from "../../utils/parser";
-import { GeolocationOutput } from "../writers/types/GeolocationOutput";
+import { GeolocationOutput } from "../../types/GeolocationOutput";
 
 export interface IRedisService {
   setLocation(location: GeolocationOutput): Promise<void>;

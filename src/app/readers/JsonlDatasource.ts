@@ -1,12 +1,13 @@
 import readline from "node:readline";
+
 import { Readable } from "node:stream";
 import { createReadStream } from "node:fs";
 
-import { loggerInfo } from "../../../utils/logger";
-import { constants } from "../../constants/constants";
-import { getFilePath } from "../../../utils/getFilePath";
-import { DataSourceInput } from "../types/DataSourceInput";
-import { JsonlDataSourceInput } from "../types/JsonlDatasourceInput";
+import { loggerInfo } from "../../utils/logger";
+import { constants } from "../constants/constants";
+import { getFilePath } from "../../utils/getFilePath";
+import { DataSourceInput } from "../../types/DataSourceInput";
+import { JsonlDataSourceInput } from "../../types/JsonlDatasourceInput";
 
 export class JsonlDataSource extends Readable {
   constructor() {

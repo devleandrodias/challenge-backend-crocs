@@ -1,12 +1,11 @@
 import { inject, injectable } from "tsyringe";
 import { Transform, TransformCallback } from "node:stream";
 
-import { loggerInfo } from "../../../utils/logger";
-import { IRedisService } from "../../services/RedisService";
-import { geolocationApi } from "../../../apis/geolocation.api";
-import { DataSourceInput } from "../../readers/types/DataSourceInput";
-import { GeolocationResponseApi } from "../types/GeolocationResponseApi";
-import { GeolocationOutput } from "../../writers/types/GeolocationOutput";
+import { loggerInfo } from "../../utils/logger";
+import { geolocationApi } from "../../apis/geolocation.api";
+import { DataSourceInput } from "../../types/DataSourceInput";
+import { GeolocationOutput } from "../../types/GeolocationOutput";
+import { GeolocationResponseApi } from "../../types/GeolocationResponseApi";
 
 @injectable()
 export class ExternalApiTransform extends Transform {

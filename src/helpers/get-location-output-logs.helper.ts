@@ -2,7 +2,7 @@ import { kafka } from "../configs/kafka.config";
 import { parseStringToObj } from "../utils/parser";
 import { EKafkaTopics } from "../shared/enuns/EKafkaTopics";
 import { EKafkaGroupId } from "../shared/enuns/EKafkaGroupIds";
-import { GeolocationOutput } from "../app/writers/types/GeolocationOutput";
+import { GeolocationOutput } from "../types/GeolocationOutput";
 
 (async () => {
   console.clear();

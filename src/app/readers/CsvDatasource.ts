@@ -4,10 +4,10 @@ import { createReadStream } from "node:fs";
 import { parse } from "csv-parse";
 import { injectable } from "tsyringe";
 
-import { loggerInfo } from "../../../utils/logger";
-import { constants } from "../../constants/constants";
-import { getFilePath } from "../../../utils/getFilePath";
-import { DataSourceInput } from "../types/DataSourceInput";
+import { loggerInfo } from "../../utils/logger";
+import { constants } from "../constants/constants";
+import { getFilePath } from "../../utils/getFilePath";
+import { DataSourceInput } from "../../types/DataSourceInput";
 
 @injectable()
 export class CsvDataSource extends Readable {
