@@ -1,8 +1,8 @@
+import readline from "node:readline";
+
+import { injectable } from "tsyringe";
 import { Readable } from "node:stream";
 import { createReadStream } from "node:fs";
-
-import { parse } from "csv-parse";
-import { injectable } from "tsyringe";
 
 import { loggerInfo } from "../../utils/logger";
 import { constants } from "../constants/constants";
@@ -15,6 +15,16 @@ export class CsvDataSource extends Readable {
     super({ objectMode: true });
   }
 
+  private parseDataString(dataString: string): {
+    timestamp: number;
+    clientId: string;
+    ip: string | null;
+  } {
+    const [timestampStr, clientId, ip] = dataString.split(",");
+    const timestamp = parseInt(timestampStr);
+    return { timestamp, clientId, ip };
+  }
+
   _read(): void {
     loggerInfo({ type: "info", log: "[READER: Csv]: Reading data" });
 
@@ -25,26 +35,35 @@ export class CsvDataSource extends Readable {
 
     let isFirstLine = true;
 
-    createReadStream(fileInputPath)
-      .pipe(parse())
-      .on("data", (row) => {
-        if (isFirstLine) {
-          isFirstLine = false;
-          return;
-        }
+    const rl = readline.createInterface({
+      input: createReadStream(fileInputPath),
+      output: process.stdout,
+      terminal: false,
+    });
 
-        const [timestamp, clientId, ip] = row;
+    rl.on("line", (line) => {
+      if (isFirstLine) {
+        isFirstLine = false;
+        return;
+      }
 
-        const data: DataSourceInput = {
-          ip,
-          clientId,
-          timestamp: Number(timestamp),
-        };
+      const { timestamp, clientId, ip } = this.parseDataString(line);
 
-        this.push(data);
-      })
-      .on("end", () => {
-        this.push(null);
-      });
+      if (!ip) {
+        return;
+      }
+
+      const data: DataSourceInput = {
+        ip,
+        clientId,
+        timestamp: Number(timestamp),
+      };
+
+      this.push(data);
+    });
+
+    rl.on("close", () => {
+      this.push(null);
+    });
   }
 }
