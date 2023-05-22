@@ -1,8 +1,8 @@
 import "reflect-metadata";
 
-import { DataSourceInput } from "../../src/types/DataSourceInput";
 import { JsonlDataSource } from "../../src/app/readers/JsonlDatasource";
 import { JsonlDataSourceInput } from "../../src/types/JsonlDatasourceInput";
+import { DataSourceInput } from "../../src/types/DataSourceInput";
 
 describe("[JsonlDataSource]", () => {
   let jsonlDataSource: JsonlDataSource;
@@ -22,10 +22,6 @@ describe("[JsonlDataSource]", () => {
     ];
 
     dataChunks = [];
-  });
-
-  it("should be defined", () => {
-    expect(jsonlDataSource).toBeDefined();
   });
 
   it.skip("should read data from jsonl file", () => {

@@ -1,21 +1,31 @@
 import "reflect-metadata";
 
+import { getFilePath } from "../../src/utils/getFilePath";
+import { constants } from "../../src/app/constants/constants";
 import { IRedisService } from "../../src/services/RedisService";
 import { DataSourceInput } from "../../src/types/DataSourceInput";
 import { CsvTransform } from "../../src/app/transforms/CsvTransform";
 import { GeolocationOutput } from "../../src/types/GeolocationOutput";
 import { RedisInMemoryService } from "../services/RedisInMemoryService";
+import { CsvService, ICsvService } from "../../src/services/CsvService";
 
 describe("[CsvTransform]", () => {
+  let csvService: ICsvService;
   let redisService: IRedisService;
+
   let csvTransform: CsvTransform;
 
   let getLocationSpy: jest.SpyInstance;
   let setLocationSpy: jest.SpyInstance;
 
   beforeAll(() => {
+    csvService = new CsvService(
+      getFilePath(constants.TRANSLATOR_PATH, "IPs.csv")
+    );
+
     redisService = new RedisInMemoryService();
-    csvTransform = new CsvTransform(redisService);
+
+    csvTransform = new CsvTransform(redisService, csvService);
 
     getLocationSpy = jest.spyOn(RedisInMemoryService.prototype, "getLocation");
     setLocationSpy = jest.spyOn(RedisInMemoryService.prototype, "setLocation");

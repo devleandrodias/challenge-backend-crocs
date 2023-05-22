@@ -1,8 +1,5 @@
-import { createReadStream } from "node:fs";
-import { Transform, TransformCallback } from "node:stream";
-
-import { parse } from "csv-parse";
 import { inject, injectable } from "tsyringe";
+import { Transform, TransformCallback } from "node:stream";
 
 import { loggerInfo } from "../../utils/logger";
 import { constants } from "../constants/constants";
@@ -10,14 +7,19 @@ import { getFilePath } from "../../utils/getFilePath";
 import { IRedisService } from "../../services/RedisService";
 import { DataSourceInput } from "../../types/DataSourceInput";
 import { GeolocationOutput } from "../../types/GeolocationOutput";
+import { CsvService, ICsvService } from "../../services/CsvService";
 
 @injectable()
 export class CsvTransform extends Transform {
   constructor(
     // @ts-ignore
-    @inject("RedisService") private redisService: IRedisService
+    @inject("RedisService") private redisService: IRedisService,
+    private csvService: ICsvService
   ) {
     super({ objectMode: true });
+    this.csvService = new CsvService(
+      getFilePath(constants.TRANSLATOR_PATH, "IPs.csv")
+    );
   }
 
   async _transform(
@@ -42,28 +44,26 @@ export class CsvTransform extends Transform {
       return;
     }
 
-    const fileInputPath = getFilePath(constants.TRANSLATOR_PATH, "IPs.csv");
-    const readStream = createReadStream(fileInputPath);
+    const response = await this.csvService.getLocationByIp(chunk.ip);
 
-    readStream.pipe(parse()).on("data", async (row) => {
-      const [ip, latitude, longitude, country, state, city] = row;
+    if (!response) {
+      callback();
+      return;
+    }
 
-      if (ip === chunk.ip) {
-        const geolocation: GeolocationOutput = {
-          ip: chunk.ip,
-          clientId: chunk.clientId,
-          timestamp: chunk.timestamp,
-          city,
-          country,
-          region: state,
-          latitude: Number(latitude),
-          longitude: Number(longitude),
-        };
+    const geolocation: GeolocationOutput = {
+      ip: chunk.ip,
+      clientId: chunk.clientId,
+      timestamp: chunk.timestamp,
+      city: response.city,
+      country: response.country,
+      region: response.state,
+      latitude: response.latitude,
+      longitude: response.longitude,
+    };
 
-        await this.redisService.setLocation(geolocation);
+    await this.redisService.setLocation(geolocation);
 
-        callback(null, geolocation);
-      }
-    });
+    callback(null, geolocation);
   }
 }
