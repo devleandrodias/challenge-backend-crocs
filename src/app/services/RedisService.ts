@@ -8,7 +8,7 @@ import { GeolocationOutput } from "../writers/types/GeolocationOutput";
 export interface IRedisService {
   setLocation(location: GeolocationOutput): Promise<void>;
   getLocation(ip: string): Promise<GeolocationOutput | null>;
-  disconnect(): Promise<void>;
+  delLocation(ip: string): Promise<void>;
 }
 
 @injectable()
@@ -40,7 +40,7 @@ export class RedisService implements IRedisService {
     return null;
   }
 
-  async disconnect(): Promise<void> {
-    return this.client.disconnect();
+  async delLocation(ip: string): Promise<void> {
+    await this.client.del(ip);
   }
 }

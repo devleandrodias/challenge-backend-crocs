@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "country": "United States",
+  "countryCode": "US",
+  "region": "OH",
+  "regionName": "Ohio",
+  "city": "Whitehall",
+  "zip": "43218",
+  "lat": 39.9747,
+  "lon": -82.8947,
+  "timezone": "America/New_York",
+  "isp": "DoD Network Information Center",
+  "org": "DoD Network Information Center",
+  "as": "AS749 DoD Network Information Center",
+  "query": "30.46.245.122"
+}

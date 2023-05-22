@@ -35,30 +35,31 @@ export class ExternalApiTransform extends Transform {
         log: `[IP: ${chunk.ip}]: Already exists in cache`,
       });
 
-      callback(null);
-    } else {
-      try {
-        const { data } = await geolocationApi.get<GeolocationResponseApi>(
-          `${chunk.ip}`
-        );
+      callback();
+      return;
+    }
 
-        const geolocation: GeolocationOutput = {
-          ip: chunk.ip,
-          clientId: chunk.clientId,
-          timestamp: chunk.timestamp,
-          city: data.city,
-          country: data.country,
-          region: data.regionName,
-          latitude: data.lat,
-          longitude: data.lon,
-        };
+    try {
+      const { data } = await geolocationApi.get<GeolocationResponseApi>(
+        `${chunk.ip}`
+      );
 
-        await this.redisService.setLocation(geolocation);
+      const geolocation: GeolocationOutput = {
+        ip: chunk.ip,
+        clientId: chunk.clientId,
+        timestamp: chunk.timestamp,
+        city: data.city,
+        country: data.country,
+        region: data.regionName,
+        latitude: data.lat,
+        longitude: data.lon,
+      };
 
-        callback(null, geolocation);
-      } catch (error) {
-        callback(new Error("Error on get data from external api.."));
-      }
+      await this.redisService.setLocation(geolocation);
+
+      callback(null, geolocation);
+    } catch (error) {
+      callback(new Error("Error on get data from external api.."));
     }
   }
 }
