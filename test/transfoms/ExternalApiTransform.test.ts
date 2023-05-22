@@ -1,8 +1,8 @@
 import "reflect-metadata";
 
 import { geolocationApi } from "../../src/apis/geolocation.api";
+import { IRedisService } from "../../src/services/RedisService";
 import { DataSourceInput } from "../../src/types/DataSourceInput";
-import { IRedisService } from "../../src/app/services/RedisService";
 import { GeolocationOutput } from "../../src/types/GeolocationOutput";
 import { RedisInMemoryService } from "../services/RedisInMemoryService";
 import { GeolocationResponseApi } from "../../src/types/GeolocationResponseApi";

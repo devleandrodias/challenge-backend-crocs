@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { RedisService } from "../../src/app/services/RedisService";
+import { RedisService } from "../../src/services/RedisService";
 import { SqliteTransform } from "../../src/app/transforms/SqliteTranslator";
 
 describe("[SqliteTransform]", () => {
