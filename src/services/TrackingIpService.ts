@@ -1,7 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import { Readable, Writable, Transform } from "node:stream";
 
-import { loggerInfo } from "../../utils/logger";
+import { loggerInfo } from "../utils/logger";
 
 export interface ITrackingIpService {
   run(): Promise<void>;

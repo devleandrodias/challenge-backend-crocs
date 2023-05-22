@@ -1,9 +1,9 @@
 import { injectable } from "tsyringe";
 import { RedisClientType, createClient } from "redis";
 
-import { envs } from "../../configs/env.config";
-import { parseStringToObj } from "../../utils/parser";
-import { GeolocationOutput } from "../../types/GeolocationOutput";
+import { envs } from "../configs/env.config";
+import { parseStringToObj } from "../utils/parser";
+import { GeolocationOutput } from "../types/GeolocationOutput";
 
 export interface IRedisService {
   setLocation(location: GeolocationOutput): Promise<void>;

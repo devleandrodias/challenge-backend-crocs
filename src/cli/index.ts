@@ -3,8 +3,6 @@ import "reflect-metadata";
 import readline from "node:readline";
 import { container } from "tsyringe";
 
-import { TrackingIpService } from "../app/services/TrackingIpService";
-
 import {
   showMenuTitle,
   getMenuOptions,
@@ -28,7 +26,8 @@ import { CsvTransform } from "../app/transforms/CsvTransform";
 import { SqliteTransform } from "../app/transforms/SqliteTranslator";
 import { ExternalApiTransform } from "../app/transforms/ExternalApiTransform";
 
-import { IRedisService, RedisService } from "../app/services/RedisService";
+import { TrackingIpService } from "../services/TrackingIpService";
+import { IRedisService, RedisService } from "../services/RedisService";
 
 const rl = readline.createInterface({
   input: process.stdin,

@@ -1,4 +1,4 @@
-import { IRedisService } from "../../src/app/services/RedisService";
+import { IRedisService } from "../../src/services/RedisService";
 import { GeolocationOutput } from "../../src/types/GeolocationOutput";
 
 export class RedisInMemoryService implements IRedisService {

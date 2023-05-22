@@ -7,7 +7,7 @@ import { inject, injectable } from "tsyringe";
 import { loggerInfo } from "../../utils/logger";
 import { constants } from "../constants/constants";
 import { getFilePath } from "../../utils/getFilePath";
-import { IRedisService } from "../services/RedisService";
+import { IRedisService } from "../../services/RedisService";
 import { DataSourceInput } from "../../types/DataSourceInput";
 import { GeolocationOutput } from "../../types/GeolocationOutput";
 
